@@ -42,9 +42,7 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { DeleteModal } from './components/DeleteModal'
-import { DetailModal } from './components/DetailModal'
-import { EditModal } from './components/EditModal'
+import { StudentModal } from './components/StudentModal'
 
 export interface Student {
   id: number
@@ -153,13 +151,12 @@ export default function StudentsPage() {
   const [previewImage, setPreviewImage] = useState<string | null>(null)
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
 
-  // Action modals state
-  const [editingStudent, setEditingStudent] = useState<Student | null>(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [deletingStudent, setDeletingStudent] = useState<Student | null>(null)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [viewingStudent, setViewingStudent] = useState<Student | null>(null)
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
+  // Action modal state
+  const [modalOpen, setModalOpen] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  const [modalAction, setModalAction] = useState<'edit' | 'delete' | 'detail'>(
+    'detail'
+  )
 
   useEffect(() => {
     if (typeof window !== 'undefined' && studentsData.length > 0) {
@@ -194,107 +191,64 @@ export default function StudentsPage() {
   }
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  let value = e.target.value
+    let value = e.target.value
 
-  // +998 ni o'chirmaslik
-  if (!value.startsWith('+998')) {
-    value = '+998'
+    // +998 ni o'chirmaslik
+    if (!value.startsWith('+998')) {
+      value = '+998'
+    }
+
+    // Faqat raqamlarga ruxsat (+998 dan keyin)
+    const digits = value.slice(4).replace(/\D/g, '')
+
+    // Format: +998 XX XXX XX XX
+    let formatted = '+998'
+    if (digits.length > 0) formatted += ' ' + digits.slice(0, 2)
+    if (digits.length > 2) formatted += ' ' + digits.slice(2, 5)
+    if (digits.length > 5) formatted += ' ' + digits.slice(5, 7)
+    if (digits.length > 7) formatted += ' ' + digits.slice(7, 9)
+
+    setFormData((prev) => ({ ...prev, phone: formatted }))
   }
-
-  // Faqat raqamlarga ruxsat (+998 dan keyin)
-  const digits = value.slice(4).replace(/\D/g, '')
-
-  // Format: +998 XX XXX XX XX
-  let formatted = '+998'
-  if (digits.length > 0) formatted += ' ' + digits.slice(0, 2)
-  if (digits.length > 2) formatted += ' ' + digits.slice(2, 5)
-  if (digits.length > 5) formatted += ' ' + digits.slice(5, 7)
-  if (digits.length > 7) formatted += ' ' + digits.slice(7, 9)
-
-  setFormData((prev) => ({ ...prev, phone: formatted }))
-}
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (editingStudent) {
-      // Update existing student
-      const updatedStudent = {
-        ...editingStudent,
-        fullName: `${formData.name} ${formData.surname}`,
-        phone: formData.phone,
-        group: formData.level || editingStudent.group,
-        paymentStatus:
-          (formData.paymentStatus as 'paid' | 'pending' | 'overdue') ||
-          editingStudent.paymentStatus,
-        status: (formData.status ? 'active' : 'inactive') as
-          | 'active'
-          | 'inactive',
-        avatar: avatarPreview || editingStudent.avatar,
-      }
-
-      setStudentsData((prev) =>
-        prev.map((s) => (s.id === editingStudent.id ? updatedStudent : s))
-      )
-
-      // Show success toast
-      addToast(
-        `${editingStudent.fullName} muvaffaqiyatli yangilandi!`,
-        'success'
-      )
-
-      // Close edit modal
-      setIsEditModalOpen(false)
-      setEditingStudent(null)
-
-      // Reset form
-      setFormData({
-        name: '',
-        surname: '',
-        phone: '',
-        level: '',
-        status: true,
-        paymentStatus: '',
-        avatar: null,
-      })
-      setAvatarPreview('')
-    } else {
-      // Add new student
-      const newStudent = {
-        id: studentsData.length + 1,
-        fullName: `${formData.name} ${formData.surname}`,
-        phone: formData.phone,
-        group: formData.level || 'Belgilanmagan',
-        paymentStatus:
-          (formData.paymentStatus as 'paid' | 'pending' | 'overdue') ||
-          'pending',
-        status: (formData.status ? 'active' : 'inactive') as
-          | 'active'
-          | 'inactive',
-        avatar: avatarPreview || null,
-      }
-
-      setStudentsData((prev) => [newStudent, ...prev])
-
-      // Show success toast
-      addToast(
-        `${formData.name} ${formData.surname} muvaffaqiyatli qo'shildi!`,
-        'success'
-      )
-
-      // Reset form and close add modal
-      setFormData({
-        name: '',
-        surname: '',
-        phone: '',
-        level: '',
-        status: true,
-        paymentStatus: '',
-        avatar: null,
-      })
-      setAvatarPreview('')
-      setIsModalOpen(false)
+    // Add new student functionality only - edit is now handled by modal
+    // Add new student
+    const newStudent = {
+      id: studentsData.length + 1,
+      fullName: `${formData.name} ${formData.surname}`,
+      phone: formData.phone,
+      group: formData.level || 'Belgilanmagan',
+      paymentStatus:
+        (formData.paymentStatus as 'paid' | 'pending' | 'overdue') || 'pending',
+      status: (formData.status ? 'active' : 'inactive') as
+        | 'active'
+        | 'inactive',
+      avatar: avatarPreview || null,
     }
+
+    setStudentsData((prev) => [newStudent, ...prev])
+
+    // Show success toast
+    addToast(
+      `${formData.name} ${formData.surname} muvaffaqiyatli qo'shildi!`,
+      'success'
+    )
+
+    // Reset form and close add modal
+    setFormData({
+      name: '',
+      surname: '',
+      phone: '',
+      level: '',
+      status: true,
+      paymentStatus: '',
+      avatar: null,
+    })
+    setAvatarPreview('')
+    setIsModalOpen(false)
   }
 
   const handleCancel = () => {
@@ -311,20 +265,6 @@ export default function StudentsPage() {
     setIsModalOpen(false)
   }
 
-  // Reset form function
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      surname: '',
-      phone: '',
-      level: '',
-      status: true,
-      paymentStatus: '',
-      avatar: null,
-    })
-    setAvatarPreview('')
-  }
-
   const handleAvatarPreview = (imageUrl: string) => {
     setPreviewImage(imageUrl)
     setIsPreviewModalOpen(true)
@@ -337,40 +277,51 @@ export default function StudentsPage() {
 
   // Action handlers
   const handleEditStudent = (student: Student) => {
-    setEditingStudent(student)
-    setIsEditModalOpen(true)
-
-    // Populate form with student data
-    const [name, surname] = student.fullName.split(' ', 2)
-    setFormData({
-      name: name || '',
-      surname: surname || '',
-      phone: student.phone,
-      level: student.group,
-      status: student.status === 'active',
-      paymentStatus: student.paymentStatus,
-      avatar: null,
-    })
-    setAvatarPreview(student.avatar || '')
+    setSelectedStudent(student)
+    setModalAction('edit')
+    setModalOpen(true)
   }
 
   const handleDeleteStudent = (student: Student) => {
-    setDeletingStudent(student)
-    setIsDeleteModalOpen(true)
+    setSelectedStudent(student)
+    setModalAction('delete')
+    setModalOpen(true)
   }
 
   const handleViewStudent = (student: Student) => {
-    setViewingStudent(student)
-    setIsDetailModalOpen(true)
+    setSelectedStudent(student)
+    setModalAction('detail')
+    setModalOpen(true)
   }
 
-  const confirmDelete = () => {
-    if (deletingStudent) {
-      setStudentsData((prev) => prev.filter((s) => s.id !== deletingStudent.id))
-      addToast(`${deletingStudent.fullName} o'chirildi`, 'success')
-      setIsDeleteModalOpen(false)
-      setDeletingStudent(null)
+  const handleModalClose = () => {
+    setModalOpen(false)
+    setSelectedStudent(null)
+  }
+
+  const handleModalConfirm = (updatedStudent: Student) => {
+    if (modalAction === 'delete') {
+      // Delete functionality
+      setStudentsData((prevStudents) =>
+        prevStudents.filter((s) => s.id !== updatedStudent.id)
+      )
+      addToast(
+        `"${updatedStudent.fullName}" o'quvchisi muvaffaqiyatli o'chirildi`,
+        'success'
+      )
+    } else if (modalAction === 'edit') {
+      // Edit functionality
+      setStudentsData((prevStudents) =>
+        prevStudents.map((s) =>
+          s.id === updatedStudent.id ? updatedStudent : s
+        )
+      )
+      addToast(
+        `"${updatedStudent.fullName}" o'quvchisi muvaffaqiyatli yangilandi`,
+        'success'
+      )
     }
+    handleModalClose()
   }
 
   return (
@@ -399,8 +350,16 @@ export default function StudentsPage() {
                   <Button
                     className='rounded-2xl bg-[#C00639] shadow-sm shadow-[#C00639] hover:bg-red-700 dark:border dark:border-[#A01521] dark:bg-transparent dark:text-white dark:hover:border-[#A01521]'
                     onClick={() => {
-                      resetForm()
-                      setEditingStudent(null)
+                      setFormData({
+                        name: '',
+                        surname: '',
+                        phone: '',
+                        level: '',
+                        status: true,
+                        paymentStatus: '',
+                        avatar: null,
+                      })
+                      setAvatarPreview('')
                     }}
                   >
                     <Plus className='mr-2 h-4 w-4' />
@@ -811,35 +770,14 @@ export default function StudentsPage() {
           </DialogContent>
         </Dialog>
 
-        {deletingStudent && (
-          <DeleteModal
-            student={deletingStudent}
-            isOpen={isDeleteModalOpen}
-            onOpenChange={setIsDeleteModalOpen}
-            onConfirm={confirmDelete}
-            onCancel={() => setIsDeleteModalOpen(false)}
-          />
-        )}
-
-        {viewingStudent && (
-          <DetailModal
-            student={viewingStudent}
-            isOpen={isDetailModalOpen}
-            onOpenChange={setIsDetailModalOpen}
-          />
-        )}
-
-        {editingStudent && (
-          <EditModal
-            student={editingStudent}
-            isOpen={isEditModalOpen}
-            onOpenChange={setIsEditModalOpen}
-            onCancel={() => {
-              setIsEditModalOpen(false)
-              setEditingStudent(null)
-            }}
-          />
-        )}
+        {/* Student Modal */}
+        <StudentModal
+          student={selectedStudent}
+          isOpen={modalOpen}
+          onClose={handleModalClose}
+          action={modalAction}
+          onConfirm={handleModalConfirm}
+        />
       </div>
     </SearchProvider>
   )
