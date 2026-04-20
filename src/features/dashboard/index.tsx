@@ -10,32 +10,6 @@ import { ThemeSwitch } from '@/components/theme-switch';
 import { GroupCapacity } from './components/group-capacity';
 import { StudentGrowth } from './components/student-growth';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export default function Dashboard() {
   return (
     <div className='min-h-screen bg-[#F8FAFC] dark:bg-[#020617]'>
