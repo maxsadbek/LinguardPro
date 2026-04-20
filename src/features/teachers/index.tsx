@@ -1,10 +1,46 @@
-import { useState } from 'react'
-import { ConfigDrawer } from '@/components/config-drawer'
-import { Header } from '@/components/layout/header'
-import { Main } from '@/components/layout/main'
-import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
-import { ThemeSwitch } from '@/components/theme-switch'
+import { useState } from 'react';
+import { ConfigDrawer } from '@/components/config-drawer';
+import { Header } from '@/components/layout/header';
+import { Main } from '@/components/layout/main';
+import { ProfileDropdown } from '@/components/profile-dropdown';
+import { Search } from '@/components/search';
+import { ThemeSwitch } from '@/components/theme-switch';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // --- Interfaces ---
 interface Teacher {
@@ -50,11 +86,11 @@ const mockTeachers: Teacher[] = [
     initials: 'SA',
     subject: 'Grammar Specialist',
     badgeColor: {
-      bg: '#f0f9ff',
-      text: '#0369a1',
-      border: '#bae6fd',
-      avatarBg: '#f0f9ff',
-      avatarFill: '#7dd3fc',
+      bg: '#fff1f2',
+      text: '#e11d48',
+      border: '#fda4af',
+      avatarBg: '#fff1f2',
+      avatarFill: '#fb7185',
     },
     phone: '+998 89 345-22-11',
     groups: 5,
@@ -67,11 +103,11 @@ const mockTeachers: Teacher[] = [
     initials: 'MR',
     subject: 'English for Kids',
     badgeColor: {
-      bg: '#f0fdf4',
-      text: '#15803d',
-      border: '#bbf7d0',
-      avatarBg: '#f0fdf4',
-      avatarFill: '#86efac',
+      bg: '#fff1f2',
+      text: '#e11d48',
+      border: '#fda4af',
+      avatarBg: '#fff1f2',
+      avatarFill: '#fb7185',
     },
     phone: '+998 97 777-00-11',
     groups: 12,
@@ -84,11 +120,11 @@ const mockTeachers: Teacher[] = [
     initials: 'JT',
     subject: 'Business English',
     badgeColor: {
-      bg: '#fdf4ff',
-      text: '#a21caf',
-      border: '#f5d0fe',
-      avatarBg: '#fdf4ff',
-      avatarFill: '#f0abfc',
+      bg: '#fff1f2',
+      text: '#e11d48',
+      border: '#fda4af',
+      avatarBg: '#fff1f2',
+      avatarFill: '#fb7185',
     },
     phone: '+998 93 445-56-67',
     groups: 4,
@@ -101,11 +137,11 @@ const mockTeachers: Teacher[] = [
     initials: 'EP',
     subject: 'Russian Expert',
     badgeColor: {
-      bg: '#fff7ed',
-      text: '#c2410c',
-      border: '#fed7aa',
-      avatarBg: '#fff7ed',
-      avatarFill: '#fdba74',
+      bg: '#fff1f2',
+      text: '#e11d48',
+      border: '#fda4af',
+      avatarBg: '#fff1f2',
+      avatarFill: '#fb7185',
     },
     phone: '+998 80 900-11-22',
     groups: 6,
