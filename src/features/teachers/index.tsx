@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useToast } from '@/components/ui/toast'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -6,7 +7,6 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { TeacherModal } from './TeacherModal'
-import { useToast } from '@/components/ui/toast'
 
 // --- Interfaces ---
 interface Teacher {
@@ -459,6 +459,10 @@ export default function TeachersPage() {
     setModalOpen(true)
   }
 
+  const handleAdd = () => {
+    addToast("Yangi ustoz qo'shish funksiyasi tez orada qo'shiladi", 'info')
+  }
+
   const handleModalClose = () => {
     setModalOpen(false)
     setSelectedTeacher(null)
@@ -549,7 +553,7 @@ export default function TeachersPage() {
               onDetail={handleDetail}
             />
           ))}
-          <AddCard onAdd={() => {}} />
+          <AddCard onAdd={handleAdd} />
         </div>
 
         {/* KPI Section */}
