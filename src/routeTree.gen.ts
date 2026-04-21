@@ -23,8 +23,11 @@ import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
+import { Route as AuthenticatedTeacherDashboardRouteRouteImport } from './routes/_authenticated/teacher-dashboard/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
+import { Route as AuthenticatedTeachersIndexRouteImport } from './routes/_authenticated/teachers/index'
+import { Route as AuthenticatedTeacherDashboardIndexRouteImport } from './routes/_authenticated/teacher-dashboard/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedStudentsIndexRouteImport } from './routes/_authenticated/students/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
@@ -34,6 +37,13 @@ import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authentica
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
+import { Route as AuthenticatedTeacherDashboardResultsRouteImport } from './routes/_authenticated/teacher-dashboard/results'
+import { Route as AuthenticatedTeacherDashboardProfileRouteImport } from './routes/_authenticated/teacher-dashboard/profile'
+import { Route as AuthenticatedTeacherDashboardMessagesRouteImport } from './routes/_authenticated/teacher-dashboard/messages'
+import { Route as AuthenticatedTeacherDashboardHomeworkRouteImport } from './routes/_authenticated/teacher-dashboard/homework'
+import { Route as AuthenticatedTeacherDashboardGroupsRouteImport } from './routes/_authenticated/teacher-dashboard/groups'
+import { Route as AuthenticatedTeacherDashboardAttendanceRouteImport } from './routes/_authenticated/teacher-dashboard/attendance'
+import { Route as AuthenticatedTeacherDashboardAnnouncementsRouteImport } from './routes/_authenticated/teacher-dashboard/announcements'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
@@ -107,6 +117,12 @@ const ClerkauthRouteRoute = ClerkauthRouteRouteImport.update({
   id: '/(auth)',
   getParentRoute: () => ClerkRouteRoute,
 } as any)
+const AuthenticatedTeacherDashboardRouteRoute =
+  AuthenticatedTeacherDashboardRouteRouteImport.update({
+    id: '/teacher-dashboard',
+    path: '/teacher-dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRouteRoute =
   AuthenticatedSettingsRouteRouteImport.update({
     id: '/settings',
@@ -118,6 +134,18 @@ const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
   path: '/users/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTeachersIndexRoute =
+  AuthenticatedTeachersIndexRouteImport.update({
+    id: '/teachers/',
+    path: '/teachers/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedTeacherDashboardIndexRoute =
+  AuthenticatedTeacherDashboardIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedTeacherDashboardRouteRoute,
+  } as any)
 const AuthenticatedTasksIndexRoute = AuthenticatedTasksIndexRouteImport.update({
   id: '/tasks/',
   path: '/tasks/',
@@ -167,6 +195,48 @@ const ClerkauthSignInRoute = ClerkauthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => ClerkauthRouteRoute,
 } as any)
+const AuthenticatedTeacherDashboardResultsRoute =
+  AuthenticatedTeacherDashboardResultsRouteImport.update({
+    id: '/results',
+    path: '/results',
+    getParentRoute: () => AuthenticatedTeacherDashboardRouteRoute,
+  } as any)
+const AuthenticatedTeacherDashboardProfileRoute =
+  AuthenticatedTeacherDashboardProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedTeacherDashboardRouteRoute,
+  } as any)
+const AuthenticatedTeacherDashboardMessagesRoute =
+  AuthenticatedTeacherDashboardMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedTeacherDashboardRouteRoute,
+  } as any)
+const AuthenticatedTeacherDashboardHomeworkRoute =
+  AuthenticatedTeacherDashboardHomeworkRouteImport.update({
+    id: '/homework',
+    path: '/homework',
+    getParentRoute: () => AuthenticatedTeacherDashboardRouteRoute,
+  } as any)
+const AuthenticatedTeacherDashboardGroupsRoute =
+  AuthenticatedTeacherDashboardGroupsRouteImport.update({
+    id: '/groups',
+    path: '/groups',
+    getParentRoute: () => AuthenticatedTeacherDashboardRouteRoute,
+  } as any)
+const AuthenticatedTeacherDashboardAttendanceRoute =
+  AuthenticatedTeacherDashboardAttendanceRouteImport.update({
+    id: '/attendance',
+    path: '/attendance',
+    getParentRoute: () => AuthenticatedTeacherDashboardRouteRoute,
+  } as any)
+const AuthenticatedTeacherDashboardAnnouncementsRoute =
+  AuthenticatedTeacherDashboardAnnouncementsRouteImport.update({
+    id: '/announcements',
+    path: '/announcements',
+    getParentRoute: () => AuthenticatedTeacherDashboardRouteRoute,
+  } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -202,6 +272,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/teacher-dashboard': typeof AuthenticatedTeacherDashboardRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/sign-in': typeof authSignInRoute
   '/sign-in-2': typeof authSignIn2Route
@@ -216,6 +287,13 @@ export interface FileRoutesByFullPath {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/teacher-dashboard/announcements': typeof AuthenticatedTeacherDashboardAnnouncementsRoute
+  '/teacher-dashboard/attendance': typeof AuthenticatedTeacherDashboardAttendanceRoute
+  '/teacher-dashboard/groups': typeof AuthenticatedTeacherDashboardGroupsRoute
+  '/teacher-dashboard/homework': typeof AuthenticatedTeacherDashboardHomeworkRoute
+  '/teacher-dashboard/messages': typeof AuthenticatedTeacherDashboardMessagesRoute
+  '/teacher-dashboard/profile': typeof AuthenticatedTeacherDashboardProfileRoute
+  '/teacher-dashboard/results': typeof AuthenticatedTeacherDashboardResultsRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -225,6 +303,8 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/students/': typeof AuthenticatedStudentsIndexRoute
   '/tasks/': typeof AuthenticatedTasksIndexRoute
+  '/teacher-dashboard/': typeof AuthenticatedTeacherDashboardIndexRoute
+  '/teachers/': typeof AuthenticatedTeachersIndexRoute
   '/users/': typeof AuthenticatedUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -244,6 +324,13 @@ export interface FileRoutesByTo {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/teacher-dashboard/announcements': typeof AuthenticatedTeacherDashboardAnnouncementsRoute
+  '/teacher-dashboard/attendance': typeof AuthenticatedTeacherDashboardAttendanceRoute
+  '/teacher-dashboard/groups': typeof AuthenticatedTeacherDashboardGroupsRoute
+  '/teacher-dashboard/homework': typeof AuthenticatedTeacherDashboardHomeworkRoute
+  '/teacher-dashboard/messages': typeof AuthenticatedTeacherDashboardMessagesRoute
+  '/teacher-dashboard/profile': typeof AuthenticatedTeacherDashboardProfileRoute
+  '/teacher-dashboard/results': typeof AuthenticatedTeacherDashboardResultsRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -253,6 +340,8 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/students': typeof AuthenticatedStudentsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
+  '/teacher-dashboard': typeof AuthenticatedTeacherDashboardIndexRoute
+  '/teachers': typeof AuthenticatedTeachersIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -260,6 +349,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/clerk': typeof ClerkRouteRouteWithChildren
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
+  '/_authenticated/teacher-dashboard': typeof AuthenticatedTeacherDashboardRouteRouteWithChildren
   '/clerk/(auth)': typeof ClerkauthRouteRouteWithChildren
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
@@ -277,6 +367,13 @@ export interface FileRoutesById {
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/teacher-dashboard/announcements': typeof AuthenticatedTeacherDashboardAnnouncementsRoute
+  '/_authenticated/teacher-dashboard/attendance': typeof AuthenticatedTeacherDashboardAttendanceRoute
+  '/_authenticated/teacher-dashboard/groups': typeof AuthenticatedTeacherDashboardGroupsRoute
+  '/_authenticated/teacher-dashboard/homework': typeof AuthenticatedTeacherDashboardHomeworkRoute
+  '/_authenticated/teacher-dashboard/messages': typeof AuthenticatedTeacherDashboardMessagesRoute
+  '/_authenticated/teacher-dashboard/profile': typeof AuthenticatedTeacherDashboardProfileRoute
+  '/_authenticated/teacher-dashboard/results': typeof AuthenticatedTeacherDashboardResultsRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
@@ -286,6 +383,8 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/students/': typeof AuthenticatedStudentsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
+  '/_authenticated/teacher-dashboard/': typeof AuthenticatedTeacherDashboardIndexRoute
+  '/_authenticated/teachers/': typeof AuthenticatedTeachersIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -294,6 +393,7 @@ export interface FileRouteTypes {
     | '/'
     | '/clerk'
     | '/settings'
+    | '/teacher-dashboard'
     | '/forgot-password'
     | '/sign-in'
     | '/sign-in-2'
@@ -308,6 +408,13 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/teacher-dashboard/announcements'
+    | '/teacher-dashboard/attendance'
+    | '/teacher-dashboard/groups'
+    | '/teacher-dashboard/homework'
+    | '/teacher-dashboard/messages'
+    | '/teacher-dashboard/profile'
+    | '/teacher-dashboard/results'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
@@ -317,6 +424,8 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/students/'
     | '/tasks/'
+    | '/teacher-dashboard/'
+    | '/teachers/'
     | '/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -336,6 +445,13 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/teacher-dashboard/announcements'
+    | '/teacher-dashboard/attendance'
+    | '/teacher-dashboard/groups'
+    | '/teacher-dashboard/homework'
+    | '/teacher-dashboard/messages'
+    | '/teacher-dashboard/profile'
+    | '/teacher-dashboard/results'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
@@ -345,12 +461,15 @@ export interface FileRouteTypes {
     | '/settings'
     | '/students'
     | '/tasks'
+    | '/teacher-dashboard'
+    | '/teachers'
     | '/users'
   id:
     | '__root__'
     | '/_authenticated'
     | '/clerk'
     | '/_authenticated/settings'
+    | '/_authenticated/teacher-dashboard'
     | '/clerk/(auth)'
     | '/clerk/_authenticated'
     | '/(auth)/forgot-password'
@@ -368,6 +487,13 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/teacher-dashboard/announcements'
+    | '/_authenticated/teacher-dashboard/attendance'
+    | '/_authenticated/teacher-dashboard/groups'
+    | '/_authenticated/teacher-dashboard/homework'
+    | '/_authenticated/teacher-dashboard/messages'
+    | '/_authenticated/teacher-dashboard/profile'
+    | '/_authenticated/teacher-dashboard/results'
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
@@ -377,6 +503,8 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/'
     | '/_authenticated/students/'
     | '/_authenticated/tasks/'
+    | '/_authenticated/teacher-dashboard/'
+    | '/_authenticated/teachers/'
     | '/_authenticated/users/'
   fileRoutesById: FileRoutesById
 }
@@ -494,6 +622,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClerkauthRouteRouteImport
       parentRoute: typeof ClerkRouteRoute
     }
+    '/_authenticated/teacher-dashboard': {
+      id: '/_authenticated/teacher-dashboard'
+      path: '/teacher-dashboard'
+      fullPath: '/teacher-dashboard'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings': {
       id: '/_authenticated/settings'
       path: '/settings'
@@ -507,6 +642,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/users/'
       preLoaderRoute: typeof AuthenticatedUsersIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/teachers/': {
+      id: '/_authenticated/teachers/'
+      path: '/teachers'
+      fullPath: '/teachers/'
+      preLoaderRoute: typeof AuthenticatedTeachersIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/teacher-dashboard/': {
+      id: '/_authenticated/teacher-dashboard/'
+      path: '/'
+      fullPath: '/teacher-dashboard/'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedTeacherDashboardRouteRoute
     }
     '/_authenticated/tasks/': {
       id: '/_authenticated/tasks/'
@@ -571,6 +720,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClerkauthSignInRouteImport
       parentRoute: typeof ClerkauthRouteRoute
     }
+    '/_authenticated/teacher-dashboard/results': {
+      id: '/_authenticated/teacher-dashboard/results'
+      path: '/results'
+      fullPath: '/teacher-dashboard/results'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardResultsRouteImport
+      parentRoute: typeof AuthenticatedTeacherDashboardRouteRoute
+    }
+    '/_authenticated/teacher-dashboard/profile': {
+      id: '/_authenticated/teacher-dashboard/profile'
+      path: '/profile'
+      fullPath: '/teacher-dashboard/profile'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardProfileRouteImport
+      parentRoute: typeof AuthenticatedTeacherDashboardRouteRoute
+    }
+    '/_authenticated/teacher-dashboard/messages': {
+      id: '/_authenticated/teacher-dashboard/messages'
+      path: '/messages'
+      fullPath: '/teacher-dashboard/messages'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardMessagesRouteImport
+      parentRoute: typeof AuthenticatedTeacherDashboardRouteRoute
+    }
+    '/_authenticated/teacher-dashboard/homework': {
+      id: '/_authenticated/teacher-dashboard/homework'
+      path: '/homework'
+      fullPath: '/teacher-dashboard/homework'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardHomeworkRouteImport
+      parentRoute: typeof AuthenticatedTeacherDashboardRouteRoute
+    }
+    '/_authenticated/teacher-dashboard/groups': {
+      id: '/_authenticated/teacher-dashboard/groups'
+      path: '/groups'
+      fullPath: '/teacher-dashboard/groups'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardGroupsRouteImport
+      parentRoute: typeof AuthenticatedTeacherDashboardRouteRoute
+    }
+    '/_authenticated/teacher-dashboard/attendance': {
+      id: '/_authenticated/teacher-dashboard/attendance'
+      path: '/attendance'
+      fullPath: '/teacher-dashboard/attendance'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardAttendanceRouteImport
+      parentRoute: typeof AuthenticatedTeacherDashboardRouteRoute
+    }
+    '/_authenticated/teacher-dashboard/announcements': {
+      id: '/_authenticated/teacher-dashboard/announcements'
+      path: '/announcements'
+      fullPath: '/teacher-dashboard/announcements'
+      preLoaderRoute: typeof AuthenticatedTeacherDashboardAnnouncementsRouteImport
+      parentRoute: typeof AuthenticatedTeacherDashboardRouteRoute
+    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -632,8 +830,45 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
+interface AuthenticatedTeacherDashboardRouteRouteChildren {
+  AuthenticatedTeacherDashboardAnnouncementsRoute: typeof AuthenticatedTeacherDashboardAnnouncementsRoute
+  AuthenticatedTeacherDashboardAttendanceRoute: typeof AuthenticatedTeacherDashboardAttendanceRoute
+  AuthenticatedTeacherDashboardGroupsRoute: typeof AuthenticatedTeacherDashboardGroupsRoute
+  AuthenticatedTeacherDashboardHomeworkRoute: typeof AuthenticatedTeacherDashboardHomeworkRoute
+  AuthenticatedTeacherDashboardMessagesRoute: typeof AuthenticatedTeacherDashboardMessagesRoute
+  AuthenticatedTeacherDashboardProfileRoute: typeof AuthenticatedTeacherDashboardProfileRoute
+  AuthenticatedTeacherDashboardResultsRoute: typeof AuthenticatedTeacherDashboardResultsRoute
+  AuthenticatedTeacherDashboardIndexRoute: typeof AuthenticatedTeacherDashboardIndexRoute
+}
+
+const AuthenticatedTeacherDashboardRouteRouteChildren: AuthenticatedTeacherDashboardRouteRouteChildren =
+  {
+    AuthenticatedTeacherDashboardAnnouncementsRoute:
+      AuthenticatedTeacherDashboardAnnouncementsRoute,
+    AuthenticatedTeacherDashboardAttendanceRoute:
+      AuthenticatedTeacherDashboardAttendanceRoute,
+    AuthenticatedTeacherDashboardGroupsRoute:
+      AuthenticatedTeacherDashboardGroupsRoute,
+    AuthenticatedTeacherDashboardHomeworkRoute:
+      AuthenticatedTeacherDashboardHomeworkRoute,
+    AuthenticatedTeacherDashboardMessagesRoute:
+      AuthenticatedTeacherDashboardMessagesRoute,
+    AuthenticatedTeacherDashboardProfileRoute:
+      AuthenticatedTeacherDashboardProfileRoute,
+    AuthenticatedTeacherDashboardResultsRoute:
+      AuthenticatedTeacherDashboardResultsRoute,
+    AuthenticatedTeacherDashboardIndexRoute:
+      AuthenticatedTeacherDashboardIndexRoute,
+  }
+
+const AuthenticatedTeacherDashboardRouteRouteWithChildren =
+  AuthenticatedTeacherDashboardRouteRoute._addFileChildren(
+    AuthenticatedTeacherDashboardRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
+  AuthenticatedTeacherDashboardRouteRoute: typeof AuthenticatedTeacherDashboardRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -641,11 +876,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedStudentsIndexRoute: typeof AuthenticatedStudentsIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
+  AuthenticatedTeachersIndexRoute: typeof AuthenticatedTeachersIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
+  AuthenticatedTeacherDashboardRouteRoute:
+    AuthenticatedTeacherDashboardRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
@@ -653,6 +891,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedStudentsIndexRoute: AuthenticatedStudentsIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
+  AuthenticatedTeachersIndexRoute: AuthenticatedTeachersIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
 }
 
