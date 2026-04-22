@@ -2,16 +2,6 @@ import { AudioWaveform, Bell, GalleryVerticalEnd, LayoutDashboard, ListTodo, Mes
 import { CustomLogo } from '@/assets/custom-logo';
 import { type SidebarData } from '../types';
 
-
-
-
-
-
-
-
-
-
-
 export const sidebarData: SidebarData = {
   user: {
     name: 'satnaing',
