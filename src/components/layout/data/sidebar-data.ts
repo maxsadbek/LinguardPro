@@ -7,6 +7,11 @@ import { type SidebarData } from '../types';
 
 
 
+
+
+
+
+
 export const sidebarData: SidebarData = {
   user: {
     name: 'satnaing',
@@ -50,15 +55,15 @@ export const sidebarData: SidebarData = {
           icon: GraduationCap,
         },
         {
+          title: 'Group',
+          url: '/groups',
+          icon: Users,
+        },
+        {
           title: 'Xabarlar',
           url: '/chats',
           badge: '3',
           icon: MessagesSquare,
-        },
-        {
-          title: 'Users',
-          url: '/users',
-          icon: Users,
         },
       ],
     },

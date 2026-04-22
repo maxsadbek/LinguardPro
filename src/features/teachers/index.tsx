@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { teachersData } from '@/data/teachers-data'
 import { useToast } from '@/components/ui/toast'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -25,15 +26,19 @@ interface Teacher {
   groups: number
   experience: number
   rating: number
+  avatar?: string
 }
 
-// --- Mock Data ---
-const mockTeachers: Teacher[] = [
-  {
-    id: 1,
-    name: 'Dildora Karimova',
-    initials: 'DK',
-    subject: 'IELTS Expert',
+// --- Helper function to convert teachers data ---
+const convertTeachersData = (teachers: typeof teachersData): Teacher[] => {
+  return teachers.map((teacher) => ({
+    id: teacher.id,
+    name: teacher.name,
+    initials: teacher.name
+      .split(' ')
+      .map((n) => n[0])
+      .join(''),
+    subject: teacher.subject,
     badgeColor: {
       bg: '#fff1f2',
       text: '#e11d48',
@@ -41,80 +46,15 @@ const mockTeachers: Teacher[] = [
       avatarBg: '#fff1f2',
       avatarFill: '#fb7185',
     },
-    phone: '+998 90 123-45-67',
-    groups: 8,
-    experience: 6,
-    rating: 4.9,
-  },
-  {
-    id: 2,
-    name: 'Sardor Alimov',
-    initials: 'SA',
-    subject: 'Grammar Specialist',
-    badgeColor: {
-      bg: '#fff1f2',
-      text: '#e11d48',
-      border: '#fda4af',
-      avatarBg: '#fff1f2',
-      avatarFill: '#fb7185',
-    },
-    phone: '+998 89 345-22-11',
-    groups: 5,
-    experience: 3,
-    rating: 4.7,
-  },
-  {
-    id: 3,
-    name: 'Malika Rixsiyeva',
-    initials: 'MR',
-    subject: 'English for Kids',
-    badgeColor: {
-      bg: '#fff1f2',
-      text: '#e11d48',
-      border: '#fda4af',
-      avatarBg: '#fff1f2',
-      avatarFill: '#fb7185',
-    },
-    phone: '+998 97 777-00-11',
-    groups: 12,
-    experience: 10,
-    rating: 5.0,
-  },
-  {
-    id: 4,
-    name: "Jahongir To'rayev",
-    initials: 'JT',
-    subject: 'Business English',
-    badgeColor: {
-      bg: '#fff1f2',
-      text: '#e11d48',
-      border: '#fda4af',
-      avatarBg: '#fff1f2',
-      avatarFill: '#fb7185',
-    },
-    phone: '+998 93 445-56-67',
-    groups: 4,
-    experience: 5,
-    rating: 4.8,
-  },
-  {
-    id: 5,
-    name: 'Elena Petrova',
-    initials: 'EP',
-    subject: 'Russian Expert',
-    badgeColor: {
-      bg: '#fff1f2',
-      text: '#e11d48',
-      border: '#fda4af',
-      avatarBg: '#fff1f2',
-      avatarFill: '#fb7185',
-    },
-    phone: '+998 80 900-11-22',
-    groups: 6,
-    experience: 4,
-    rating: 4.6,
-  },
-]
+    phone: teacher.phone,
+    groups: teacher.groups.length,
+    experience: parseInt(teacher.experience) || 0,
+    rating: 4.5 + Math.random() * 0.5, // Random rating between 4.5-5.0
+    avatar: teacher.avatar,
+  }))
+}
+
+const mockTeachers = convertTeachersData(teachersData)
 
 const kpiData = {
   totalTeachers: 24,

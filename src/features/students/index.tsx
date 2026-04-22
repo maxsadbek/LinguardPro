@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { studentsData } from '@/data/students-data'
 import { Edit, Eye, Plus, Search, Trash2, User, X } from 'lucide-react'
 import { SearchProvider } from '@/context/search-provider'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -54,6 +55,19 @@ export interface Student {
   avatar: string | null
 }
 
+// --- Helper function to convert students data ---
+const convertStudentsData = (students: typeof studentsData): Student[] => {
+  return students.map((student) => ({
+    id: student.id,
+    fullName: student.name,
+    phone: student.phone,
+    group: student.groupName,
+    paymentStatus: 'paid' as const, // Default payment status
+    status: student.status === 'graduated' ? 'inactive' : student.status,
+    avatar: student.avatar || null,
+  }))
+}
+
 const getInitialStudentsData = (): Student[] => {
   if (typeof window !== 'undefined') {
     const savedData = localStorage.getItem('studentsData')
@@ -62,53 +76,8 @@ const getInitialStudentsData = (): Student[] => {
     }
   }
 
-  const defaultData: Student[] = [
-    {
-      id: 1,
-      fullName: 'Karimov Ali',
-      phone: '+998 90 123 45 67',
-      group: 'Advanced-1',
-      paymentStatus: 'paid',
-      status: 'active',
-      avatar: null,
-    },
-    {
-      id: 2,
-      fullName: 'Saidova Malika',
-      phone: '+998 91 234 56 78',
-      group: 'Intermediate-2',
-      paymentStatus: 'pending',
-      status: 'active',
-      avatar: null,
-    },
-    {
-      id: 3,
-      fullName: 'Toshmatov Bobur',
-      phone: '+998 93 345 67 89',
-      group: 'Beginner-1',
-      paymentStatus: 'overdue',
-      status: 'inactive',
-      avatar: null,
-    },
-    {
-      id: 4,
-      fullName: 'Karimova Nodira',
-      phone: '+998 94 456 78 90',
-      group: 'Advanced-2',
-      paymentStatus: 'paid',
-      status: 'active',
-      avatar: null,
-    },
-    {
-      id: 5,
-      fullName: 'Azimov Jasur',
-      phone: '+998 99 567 89 01',
-      group: 'Intermediate-1',
-      paymentStatus: 'pending',
-      status: 'active',
-      avatar: null,
-    },
-  ]
+  // Use converted data from separate file
+  const defaultData = convertStudentsData(studentsData)
 
   if (typeof window !== 'undefined') {
     localStorage.setItem('studentsData', JSON.stringify(defaultData))
