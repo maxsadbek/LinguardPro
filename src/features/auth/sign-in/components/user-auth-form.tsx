@@ -19,31 +19,34 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 
-// Form validatsiyasi
 const formSchema = z.object({
-  email: z.string().email('Iltimos, yaroqli email manzilini kiriting.'),
+  username: z.string().min(1, 'Username ni kiritishingiz shart.'),
   password: z
     .string()
     .min(1, 'Parolni kiritishingiz shart.')
-    .min(7, 'Parol kamida 7 ta belgidan iborat bo\'lishi kerak.'),
+    .min(7, "Parol kamida 7 ta belgidan iborat bo'lishi kerak."),
 })
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
   redirectTo?: string
 }
 
-export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormProps) {
+export function UserAuthForm({
+  className,
+  redirectTo,
+  ...props
+}: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const { auth } = useAuthStore()
 
-  // Fokus bo'lganda rang o'zgarishi uchun style klassi
-  const focusInputStyle = "focus-visible:ring-[#C70C3D] focus-visible:ring-offset-0"
+  const focusInputStyle =
+    'focus-visible:ring-[#C70C3D] focus-visible:ring-offset-0'
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
     },
   })
@@ -51,26 +54,59 @@ export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormPr
   function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
 
-    // Simulyatsiya (login jarayoni)
+    let role: 'teacher' | 'admin' | 'user' = 'user'
+    let accountNo = 'USR001'
+
+    const normalizedUsername = data.username.trim().toLowerCase()
+    const isTeacherLogin =
+      normalizedUsername === 'teacher01' && data.password === '1111111'
+
+    if (isTeacherLogin) {
+      role = 'teacher'
+      accountNo = 'TCH001'
+    } else if (normalizedUsername.includes('admin')) {
+      role = 'admin'
+      accountNo = 'ADM001'
+    }
+
     toast.promise(sleep(2000), {
       loading: 'Tizimga kirilmoqda...',
       success: () => {
         setIsLoading(false)
         const mockUser = {
-          accountNo: 'USR001',
-          email: data.email,
-          role: 'user' as const,
+          accountNo,
+          email: normalizedUsername,
+          role,
           exp: Date.now() + 24 * 60 * 60 * 1000,
         }
 
+        sessionStorage.setItem('linguapro_user', JSON.stringify(mockUser))
         auth.setUser(mockUser)
         auth.setAccessToken('mock-access-token')
-        navigate({ to: redirectTo || '/', replace: true })
-        return `Xush kelibsiz!`
+
+        let redirectPath = '/admin-dashboard'
+        if (role === 'teacher') {
+          redirectPath = '/teacher-dashboard'
+        }
+
+        const isRoleAllowedRedirect = (() => {
+          if (!redirectTo) return false
+          if (role === 'teacher')
+            return redirectTo.startsWith('/teacher-dashboard')
+          if (role === 'admin')
+            return !redirectTo.startsWith('/teacher-dashboard')
+          return false
+        })()
+
+        navigate({
+          to: isRoleAllowedRedirect ? redirectTo : redirectPath,
+          replace: true,
+        })
+        return 'Xush kelibsiz!'
       },
       error: () => {
         setIsLoading(false)
-        return 'Login muvaffaqiyatsiz. Qayta urinib ko\'ring.'
+        return "Login muvaffaqiyatsiz. Qayta urinib ko'ring."
       },
     })
   }
@@ -82,18 +118,17 @@ export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormPr
         className={cn('grid gap-4', className)}
         {...props}
       >
-        {/* EMAIL FIELD */}
         <FormField
           control={form.control}
-          name='email'
+          name='username'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Elektron pochta</FormLabel>
+              <FormLabel>Username</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder='example@email.com' 
-                  className={focusInputStyle} 
-                  {...field} 
+                <Input
+                  placeholder='Username kiriting'
+                  className={focusInputStyle}
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -101,26 +136,25 @@ export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormPr
           )}
         />
 
-        {/* PASSWORD FIELD */}
         <FormField
           control={form.control}
           name='password'
           render={({ field }) => (
             <FormItem>
               <div className='flex items-center justify-between'>
-                <FormLabel>Parol</FormLabel>
+                <FormLabel>Password</FormLabel>
                 <Link
                   to='/forgot-password'
                   className='text-sm font-medium text-[#C70C3D] hover:underline'
                 >
-                  Parolni unutdingizmi?
+                  Forgot password?
                 </Link>
               </div>
               <FormControl>
-                <PasswordInput 
-                  placeholder='********' 
-                  className={focusInputStyle} 
-                  {...field} 
+                <PasswordInput
+                  placeholder='********'
+                  className={focusInputStyle}
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
@@ -128,9 +162,8 @@ export function UserAuthForm({ className, redirectTo, ...props }: UserAuthFormPr
           )}
         />
 
-        {/* SUBMIT BUTTON */}
-        <Button 
-          className='mt-2 w-full bg-[#C70C3D] hover:bg-[#C70C3D]/90 text-white transition-colors' 
+        <Button
+          className='mt-2 w-full bg-[#C70C3D] text-white transition-colors hover:bg-[#C70C3D]/90'
           disabled={isLoading}
         >
           {isLoading ? (
