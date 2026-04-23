@@ -7,7 +7,6 @@ import {
   BookOpen,
   MessageSquare,
   Megaphone,
-  User,
 } from 'lucide-react'
 
 const navItems = [
@@ -45,11 +44,6 @@ const navItems = [
     label: 'Announcements',
     to: '/teacher-dashboard/announcements',
     icon: Megaphone,
-  },
-  {
-    label: 'Profile',
-    to: '/teacher-dashboard/profile',
-    icon: User,
   },
 ] as const
 

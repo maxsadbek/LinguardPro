@@ -1,13 +1,6 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import {
-  Users,
-  ClipboardCheck,
-  MessageSquare,
-  Sparkles,
-  ChevronRight,
-  Video,
-} from 'lucide-react'
+import { Users, ClipboardCheck, MessageSquare, Video } from 'lucide-react'
 
 interface StatCardProps {
   icon: React.ReactNode
@@ -42,31 +35,6 @@ const StatCard = ({ icon, value, label, badge }: StatCardProps) => {
       </div>
       <p className='mt-4 text-3xl font-bold text-gray-800'>{value}</p>
       <p className='mt-1 text-sm text-gray-500'>{label}</p>
-    </div>
-  )
-}
-
-const AIInsightCard = () => {
-  return (
-    <div className='rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'>
-      <div className='flex items-start justify-between'>
-        <div className='rounded-xl bg-[#fff0f3] p-3 text-[#b80035]'>
-          <Sparkles size={24} />
-        </div>
-        <span className='rounded-full bg-[#fff0f3] px-3 py-1 text-xs font-semibold text-[#b80035]'>
-          AI INSIGHT
-        </span>
-      </div>
-      <p className='mt-4 text-lg font-bold text-gray-800'>
-        Students are struggling with past tense conjugations.
-      </p>
-      <p className='mt-2 text-sm text-gray-500'>
-        Based on recent quiz results, 65% of your students need additional
-        practice with irregular verbs.
-      </p>
-      <button className='mt-4 flex items-center gap-2 text-sm font-semibold text-[#b80035] transition-all hover:gap-3'>
-        Generate Lesson Plan <ChevronRight size={16} />
-      </button>
     </div>
   )
 }
@@ -185,7 +153,7 @@ function DashboardPage() {
       </div>
 
       {/* Stats Row */}
-      <div className='mb-8 grid grid-cols-5 gap-4'>
+      <div className='mb-8 grid grid-cols-4 gap-5'>
         <StatCard
           icon={<Users size={24} />}
           value='12'
@@ -218,7 +186,6 @@ function DashboardPage() {
             </span>
           }
         />
-        <AIInsightCard />
       </div>
 
       {/* Two Column Section */}
@@ -299,7 +266,7 @@ function DashboardPage() {
       </div>
 
       {/* Live Session Card */}
-      <div className='max-w-md'>
+      <div className='w-full max-w-lg'>
         <LiveSessionCard />
       </div>
     </>
