@@ -68,27 +68,46 @@ export function TeacherNavbar() {
 
   return (
     <header className='sticky top-0 z-50 flex w-full items-center justify-between bg-white/70 px-8 py-4 backdrop-blur-md'>
-      <div className='group relative'>
-        <Search
-          className='absolute top-1/2 left-3 -translate-y-1/2 text-slate-400'
-          size={18}
-        />
-        <input
-          className='w-64 rounded-full bg-slate-100/70 py-2 pr-6 pl-10 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-rose-600/20'
-          placeholder='Search student or task...'
-          type='text'
-        />
+      <div className='flex items-center gap-6'>
+        <Link to='/teacher-dashboard' className='leading-none'>
+          <div className='text-lg font-black tracking-tight text-[#b80035]'>
+            LINGUAPRO
+          </div>
+          <div className='mt-1 text-[11px] font-bold tracking-[0.28em] text-slate-400'>
+            TEACHER PORTAL
+          </div>
+        </Link>
+
+        <div className='group relative'>
+          <Search
+            className='absolute top-1/2 left-3 -translate-y-1/2 text-slate-400'
+            size={18}
+          />
+          <input
+            className='w-64 rounded-full bg-slate-100/70 py-2 pr-6 pl-10 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-rose-600/20'
+            placeholder='Search student or task...'
+            type='text'
+          />
+        </div>
       </div>
 
       <div className='flex items-center gap-6'>
-        <button className='relative rounded-full p-2 hover:bg-slate-100'>
+        <Link
+          to='/teacher-dashboard/notifications'
+          className='relative rounded-full p-2 hover:bg-slate-100'
+          aria-label='Notifications'
+        >
           <Bell className='text-slate-600' size={20} />
           <span className='absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-600'></span>
-        </button>
-        <button className='rounded-full p-2 hover:bg-slate-100'>
+        </Link>
+        <Link
+          to='/teacher-dashboard/settings'
+          className='rounded-full p-2 hover:bg-slate-100'
+          aria-label='Settings'
+        >
           <Settings className='text-slate-600' size={20} />
-        </button>
-        <div className='h-8 w-[1px] bg-slate-200'></div>
+        </Link>
+        <div className='h-8 w-px bg-slate-200'></div>
         <div ref={menuRef} className='relative'>
           <button
             type='button'

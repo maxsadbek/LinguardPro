@@ -57,10 +57,14 @@ export function UserAuthForm({
     let role: 'teacher' | 'admin' | 'user' = 'user'
     let accountNo = 'USR001'
 
-    if (data.username === 'teacher' && data.password === '1111111') {
+    const normalizedUsername = data.username.trim().toLowerCase()
+    const isTeacherLogin =
+      normalizedUsername === 'teacher01' && data.password === '1111111'
+
+    if (isTeacherLogin) {
       role = 'teacher'
       accountNo = 'TCH001'
-    } else if (data.username.toLowerCase().includes('admin')) {
+    } else if (normalizedUsername.includes('admin')) {
       role = 'admin'
       accountNo = 'ADM001'
     }
@@ -71,7 +75,7 @@ export function UserAuthForm({
         setIsLoading(false)
         const mockUser = {
           accountNo,
-          email: data.username,
+          email: normalizedUsername,
           role,
           exp: Date.now() + 24 * 60 * 60 * 1000,
         }
