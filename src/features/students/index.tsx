@@ -44,6 +44,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { StudentModal } from './components/StudentModal'
+import { Link } from '@tanstack/react-router'
 
 export interface Student {
   id: number
@@ -304,6 +305,17 @@ export default function StudentsPage() {
         </Header>
 
         <Main>
+          <div
+            style={{
+              fontSize: 11,
+              color: '#94a3b8',
+              fontWeight: 600,
+              letterSpacing: '0.05em',
+            }}
+          >
+            <Link to='/'>Dashboard</Link> /{' '}
+            <span style={{ color: '#e11d48' }}>Students</span>
+          </div>
           <div className='mb-8'>
             <div className='flex items-center justify-between'>
               <div>

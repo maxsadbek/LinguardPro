@@ -1,6 +1,16 @@
-import { AudioWaveform, Bell, GalleryVerticalEnd, LayoutDashboard, ListTodo, MessagesSquare, UserCog, Users, Wrench, GraduationCap } from 'lucide-react';
-import { CustomLogo } from '@/assets/custom-logo';
-import { type SidebarData } from '../types';
+import {
+  AudioWaveform,
+  Bell,
+  GalleryVerticalEnd,
+  GraduationCap,
+  LayoutDashboard,
+  ListTodo,
+  MessagesSquare,
+  UserCog,
+  Wrench,
+} from 'lucide-react'
+import { CustomLogo } from '@/assets/custom-logo'
+import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
   user: {
@@ -43,11 +53,6 @@ export const sidebarData: SidebarData = {
           title: 'Ustozlar',
           url: '/teachers',
           icon: GraduationCap,
-        },
-        {
-          title: 'Group',
-          url: '/groups',
-          icon: Users,
         },
         {
           title: 'Xabarlar',

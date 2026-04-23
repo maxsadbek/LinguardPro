@@ -1,13 +1,35 @@
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
+import { teacherGroupsData, type Student } from '@/data/groups-data'
 import { teachersData } from '@/data/teachers-data'
+import {
+  Calendar,
+  Edit,
+  MapPin,
+  SearchIcon,
+  Trash2,
+  TrendingUp,
+  Users,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { useToast } from '@/components/ui/toast'
+import { GroupModal } from '@/components/GroupModal'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { TeacherModal } from './TeacherModal'
 
 // --- Interfaces ---
 interface Teacher {
@@ -28,6 +50,47 @@ interface Teacher {
   rating: number
   avatar?: string
 }
+
+// Mock data for students with activity
+const studentsData: Student[] = [
+  {
+    id: 1,
+    name: 'Asadbek Azizov',
+    phone: '+998 90 123 45 67',
+    attendance: 'present',
+    activity: 95,
+  },
+  {
+    id: 2,
+    name: 'Dilnoza Karimova',
+    phone: '+998 91 234 56 78',
+    attendance: 'late',
+    activity: 88,
+  },
+  {
+    id: 3,
+    name: 'Bekzod Toshmatov',
+    phone: '+998 93 345 67 89',
+    attendance: 'absent',
+    activity: 72,
+  },
+  {
+    id: 4,
+    name: 'Malika Xolmatova',
+    phone: '+998 94 456 78 90',
+    attendance: 'present',
+    activity: 92,
+  },
+  {
+    id: 5,
+    name: 'Javlon Umarov',
+    phone: '+998 95 567 89 01',
+    attendance: 'present',
+    activity: 98,
+  },
+]
+
+type ViewState = 'teachers' | 'groups' | 'students'
 
 // --- Helper function to convert teachers data ---
 const convertTeachersData = (teachers: typeof teachersData): Teacher[] => {
@@ -56,15 +119,6 @@ const convertTeachersData = (teachers: typeof teachersData): Teacher[] => {
 
 const mockTeachers = convertTeachersData(teachersData)
 
-const kpiData = {
-  totalTeachers: 24,
-  activeGroups: 86,
-  totalTeachersMax: 40,
-  activeGroupsMax: 100,
-  description:
-    "Last month, teachers' average rating increased by 12%. Highest IELTS score achieved - 8.5 points.",
-}
-
 // --- Icons ---
 const PhoneIcon = () => (
   <svg
@@ -78,6 +132,64 @@ const PhoneIcon = () => (
     <path d='M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9a2 2 0 012-2.18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L9.91 14a16 16 0 006.09 6.09l.41-.41a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z' />
   </svg>
 )
+
+const AvatarSilhouette = ({ fill }: { fill: string }) => (
+  <svg viewBox='0 0 24 24' fill='none' width={28} height={28}>
+    <path
+      d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'
+      stroke={fill}
+      strokeWidth={2}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
+    <circle cx='12' cy='7' r='4' fill={fill} />
+  </svg>
+)
+
+// --- Helper Components ---
+const ActionButton = ({
+  onClick,
+  color,
+  icon,
+}: {
+  onClick: (e: React.MouseEvent) => void
+  color: 'blue' | 'purple' | 'red'
+  icon: React.ReactNode
+}) => {
+  const [hovered, setHovered] = useState(false)
+  const colors = {
+    blue: { text: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
+    purple: { text: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe' },
+    red: { text: '#dc2626', bg: '#fef2f2', border: '#fecaca' },
+  }
+  const c = colors[color]
+
+  return (
+    <button
+      onClick={(e) => {
+        e.stopPropagation()
+        onClick(e)
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '8px',
+        borderRadius: 10,
+        border: `1px solid ${hovered ? c.border : 'var(--border-primary, #e5e7eb)'}`,
+        background: hovered ? c.bg : 'transparent',
+        color: hovered ? c.text : '#64748b',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+      }}
+    >
+      {icon}
+    </button>
+  )
+}
 
 const EditIcon = () => (
   <svg
@@ -121,79 +233,27 @@ const DeleteIcon = () => (
   </svg>
 )
 
-const AvatarSilhouette = ({ fill }: { fill: string }) => (
-  <svg viewBox='0 0 40 40' fill='none' width={28} height={28}>
-    <circle cx='20' cy='15' r='8' fill={fill} />
-    <ellipse cx='20' cy='33' rx='12' ry='7' fill={fill} />
-  </svg>
-)
-
-// --- Helper Components ---
-const ActionButton = ({
-  onClick,
-  color,
-  icon,
-}: {
-  onClick: () => void
-  color: 'blue' | 'purple' | 'red'
-  icon: React.ReactNode
-}) => {
-  const [hovered, setHovered] = useState(false)
-  const colors = {
-    blue: { text: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
-    purple: { text: '#7c3aed', bg: '#f5f3ff', border: '#ddd6fe' },
-    red: { text: '#dc2626', bg: '#fef2f2', border: '#fecaca' },
-  }
-  const c = colors[color]
-
-  return (
-    <button
-      onClick={(e) => {
-        e.stopPropagation()
-        onClick()
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '8px',
-        borderRadius: 10,
-        border: `1px solid ${hovered ? c.border : 'var(--border-primary, #e5e7eb)'}`,
-        background: hovered ? c.bg : 'transparent',
-        color: hovered ? c.text : '#64748b',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-      }}
-    >
-      {icon}
-    </button>
-  )
-}
-
 function TeacherCard({
   teacher,
   onEdit,
   onDelete,
   onDetail,
+  onClick,
 }: {
   teacher: Teacher
   onEdit: (teacher: Teacher) => void
   onDelete: (teacher: Teacher) => void
   onDetail: (teacher: Teacher) => void
+  onClick?: (teacher: Teacher) => void
 }) {
   const [hovered, setHovered] = useState(false)
+  const [imageError, setImageError] = useState(false)
 
   return (
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      }}
+      onClick={onClick ? () => onClick(teacher) : undefined}
       style={{
         background: 'var(--bg-primary, #fff)',
         border: `1px solid ${hovered ? '#e5e7eb' : 'var(--border-primary, #f1f5f9)'}`,
@@ -206,6 +266,7 @@ function TeacherCard({
         boxShadow: hovered
           ? '0 12px 24px -8px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.02)'
           : '0 2px 4px 0 rgba(0,0,0,0.02)',
+        cursor: 'pointer',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -222,10 +283,11 @@ function TeacherCard({
             overflow: 'hidden',
           }}
         >
-          {teacher.avatar ? (
+          {teacher.avatar && !imageError ? (
             <img
               src={teacher.avatar}
               alt={teacher.name}
+              onError={() => setImageError(true)}
               style={{
                 width: '100%',
                 height: '100%',
@@ -303,21 +365,77 @@ function TeacherCard({
 
       <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
         <ActionButton
-          onClick={() => onEdit(teacher)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onEdit(teacher)
+          }}
           color='blue'
           icon={<EditIcon />}
         />
         <ActionButton
-          onClick={() => onDetail(teacher)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onDetail(teacher)
+          }}
           color='purple'
           icon={<DetailIcon />}
         />
         <ActionButton
-          onClick={() => onDelete(teacher)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete(teacher)
+          }}
           color='red'
           icon={<DeleteIcon />}
         />
       </div>
+
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          if (onClick) onClick(teacher)
+        }}
+        style={{
+          width: '100%',
+          padding: '12px',
+          background: '#e11d48',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 25,
+          fontWeight: 600,
+          fontSize: 13,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          boxShadow: '0 4px 12px rgba(225, 29, 72, 0.15)',
+          transition: 'all 0.2s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = '#be123c'
+          e.currentTarget.style.transform = 'translateY(-1px)'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = '#e11d48'
+          e.currentTarget.style.transform = 'translateY(0)'
+        }}
+      >
+        <svg
+          width={16}
+          height={16}
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke='currentColor'
+          strokeWidth={2.5}
+        >
+          <path d='M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2' />
+          <circle cx='9' cy='7' r='4' />
+          <path d='M23 21v-2a4 4 0 00-3-3.87' />
+          <path d='M16 3.13a4 4 0 010 7.75' />
+        </svg>
+        Ustozning guruhlarini ko'rish
+      </button>
     </div>
   )
 }
@@ -328,89 +446,423 @@ export default function TeachersPage() {
     const savedTeachers = localStorage.getItem('teachers')
     return savedTeachers ? JSON.parse(savedTeachers) : mockTeachers
   })
-  const [modalOpen, setModalOpen] = useState(false)
-  const [selectedTeacher, setSelectedTeacher] = useState<Teacher | null>(null)
-  const [modalAction, setModalAction] = useState<'edit' | 'delete' | 'detail'>(
-    'detail'
-  )
   const { addToast, ToastContainer } = useToast()
 
-  const handleDelete = (teacher: Teacher) => {
-    setSelectedTeacher(teacher)
-    setModalAction('delete')
-    setModalOpen(true)
+  // Groups functionality states
+  const [viewState, setViewState] = useState<ViewState>('teachers')
+  const [selectedTeacherForGroups, setSelectedTeacherForGroups] =
+    useState<Teacher | null>(null)
+  const [selectedGroup, setSelectedGroup] = useState<{
+    id: number
+    name: string
+    teacher: string
+    schedule: string
+    students: number
+    room: string
+  } | null>(null)
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
+  const [students, setStudents] = useState<Student[]>(studentsData)
+
+  // Group modal state
+  const [groupModalOpen, setGroupModalOpen] = useState(false)
+  const [newGroup, setNewGroup] = useState({
+    name: '',
+    description: '',
+    schedule: '',
+    room: '',
+    students: 0,
+  })
+
+  // Add student modal state
+  const [addStudentModalOpen, setAddStudentModalOpen] = useState(false)
+  const [newStudent, setNewStudent] = useState({
+    name: '',
+    phone: '',
+    attendance: 'present',
+    activity: 85,
+  })
+
+  // Student search state
+  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  )
+
+  const getFilteredGroups = () => {
+    if (!selectedTeacherForGroups) return []
+
+    try {
+      // Get saved groups from localStorage
+      const savedGroups = JSON.parse(
+        localStorage.getItem('teacherGroups') || '{}'
+      )
+      const teacherSavedGroups = savedGroups[selectedTeacherForGroups.id] || []
+
+      // Get default groups from data file
+      const defaultTeacherGroups = teacherGroupsData[
+        selectedTeacherForGroups.id as keyof typeof teacherGroupsData
+      ] || [
+        {
+          id: 7,
+          name: 'General Course',
+          teacher: selectedTeacherForGroups.name,
+          schedule: 'Dushanba-Chorshanba 09:00-11:00',
+          students: 12,
+          room: '201',
+          description: 'General English course',
+        },
+      ]
+
+      // Update teacher name in default groups
+      const updatedDefaultGroups = defaultTeacherGroups.map(
+        (group: {
+          id: number
+          name: string
+          teacher: string
+          schedule: string
+          students: number
+          room: string
+          description?: string
+        }) => ({
+          ...group,
+          teacher: selectedTeacherForGroups.name,
+        })
+      )
+
+      // Combine default groups with saved groups
+      return [...updatedDefaultGroups, ...teacherSavedGroups]
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error in getFilteredGroups:', error)
+      return []
+    }
   }
 
-  const handleEdit = (teacher: Teacher) => {
-    setSelectedTeacher(teacher)
-    setModalAction('edit')
-    setModalOpen(true)
+  const handleGroupSelect = (group: {
+    id: number
+    name: string
+    teacher: string
+    schedule: string
+    students: number
+    room: string
+  }) => {
+    setSelectedGroup(group)
+    // Set group-specific students
+    const groupStudents = getGroupStudents(group.id)
+    setStudents(groupStudents)
+    setViewState('students')
   }
 
-  const handleDetail = (teacher: Teacher) => {
-    setSelectedTeacher(teacher)
-    setModalAction('detail')
-    setModalOpen(true)
+  const getGroupStudents = (groupId: number) => {
+    try {
+      // First check localStorage for saved students
+      const savedStudents = JSON.parse(
+        localStorage.getItem('groupStudents') || '{}'
+      )
+      if (savedStudents[groupId]) {
+        return savedStudents[groupId]
+      }
+
+      // Create default students for any group
+      const defaultStudents = [
+        {
+          id: groupId * 100 + 1,
+          name: `Student ${groupId}-1`,
+          phone: '+998 90 000 00 01',
+          attendance: 'present',
+          activity: 85,
+        },
+        {
+          id: groupId * 100 + 2,
+          name: `Student ${groupId}-2`,
+          phone: '+998 90 000 00 02',
+          attendance: 'present',
+          activity: 90,
+        },
+        {
+          id: groupId * 100 + 3,
+          name: `Student ${groupId}-3`,
+          phone: '+998 90 000 00 03',
+          attendance: 'late',
+          activity: 78,
+        },
+      ]
+
+      return defaultStudents
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error in getGroupStudents:', error)
+      return []
+    }
+  }
+
+  const handleAttendanceChange = (
+    studentId: number,
+    status: 'present' | 'late' | 'absent'
+  ) => {
+    setStudents((prev) =>
+      prev.map((student) =>
+        student.id === studentId ? { ...student, attendance: status } : student
+      )
+    )
+  }
+
+  const handleAddGroup = () => {
+    if (
+      !selectedTeacherForGroups ||
+      !newGroup.name ||
+      !newGroup.schedule ||
+      !newGroup.room
+    ) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    // Get existing groups from localStorage
+    const existingGroups = JSON.parse(
+      localStorage.getItem('teacherGroups') || '{}'
+    )
+
+    // Get or create groups for this teacher
+    const teacherGroups = existingGroups[selectedTeacherForGroups.id] || []
+
+    // Create new group
+    const groupToAdd = {
+      id:
+        Math.max(...teacherGroups.map((g: { id?: number }) => g.id || 0), 0) +
+        1,
+      name: newGroup.name,
+      description: newGroup.description,
+      schedule: newGroup.schedule,
+      students: newGroup.students,
+      room: newGroup.room,
+      teacher: selectedTeacherForGroups.name,
+    }
+
+    // Add to teacher's groups
+    teacherGroups.push(groupToAdd)
+    existingGroups[selectedTeacherForGroups.id] = teacherGroups
+
+    // Create mock students for the new group
+    const newGroupStudents = createMockStudentsForGroup(
+      groupToAdd.id,
+      newGroup.students || 5
+    )
+
+    // Save students to localStorage
+    const existingStudents = JSON.parse(
+      localStorage.getItem('groupStudents') || '{}'
+    )
+    existingStudents[groupToAdd.id] = newGroupStudents
+    localStorage.setItem('groupStudents', JSON.stringify(existingStudents))
+
+    // Save to localStorage
+    localStorage.setItem('teacherGroups', JSON.stringify(existingGroups))
+
+    // Update teacher's group count in state
+    if (selectedTeacherForGroups) {
+      setTeachers((prevTeachers) =>
+        prevTeachers.map((teacher) =>
+          teacher.id === selectedTeacherForGroups.id
+            ? { ...teacher, groups: teacher.groups + 1 }
+            : teacher
+        )
+      )
+    }
+
+    // Reset form and close modal
+    setNewGroup({
+      name: '',
+      description: '',
+      schedule: '',
+      room: '',
+      students: 0,
+    })
+    setGroupModalOpen(false)
+    addToast(`"${newGroup.name}" group added successfully`, 'success')
+
+    // Force re-render of groups list by updating a dummy state
+    setViewState((prev) => (prev === 'groups' ? 'groups' : 'groups'))
+  }
+
+  const handleSearchStudents = (query: string) => {
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout)
+    }
+
+    // If search is empty, show all students immediately (no debounce)
+    if (!query.trim()) {
+      const groupStudents = getGroupStudents(selectedGroup?.id || 0)
+      setStudents(groupStudents)
+      return
+    }
+
+    // Set new timeout for debouncing non-empty searches
+    const timeout = setTimeout(() => {
+      // Local filtering only - no API calls
+      const groupStudents = getGroupStudents(selectedGroup?.id || 0)
+      const filtered = groupStudents.filter(
+        (student: Student) =>
+          student.name.toLowerCase().includes(query.toLowerCase()) ||
+          student.phone.includes(query)
+      )
+      setStudents(filtered)
+    }, 300) // 300ms debounce delay
+
+    setSearchTimeout(timeout)
+  }
+
+  const handleAddStudent = () => {
+    if (!newStudent.name || !newStudent.phone) {
+      alert('Please enter student name and phone number')
+      return
+    }
+
+    if (!selectedGroup) return
+
+    // Create new student
+    const studentToAdd: Student = {
+      id: Date.now(), // Unique ID based on timestamp
+      name: newStudent.name,
+      phone: newStudent.phone,
+      attendance: newStudent.attendance as 'present' | 'late' | 'absent',
+      activity: newStudent.activity,
+    }
+
+    // Add to students state
+    setStudents((prev) => [...prev, studentToAdd])
+
+    // Save to localStorage
+    try {
+      const existingStudents = JSON.parse(
+        localStorage.getItem('groupStudents') || '{}'
+      )
+      if (!existingStudents[selectedGroup.id]) {
+        existingStudents[selectedGroup.id] = []
+      }
+      existingStudents[selectedGroup.id].push(studentToAdd)
+      localStorage.setItem('groupStudents', JSON.stringify(existingStudents))
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error saving student:', error)
+    }
+
+    // Reset form and close modal
+    setNewStudent({
+      name: '',
+      phone: '',
+      attendance: 'present',
+      activity: 85,
+    })
+    setAddStudentModalOpen(false)
+    addToast(`"${newStudent.name}" student added successfully`, 'success')
+  }
+
+  const handleStudentActivity = (student: Student) => {
+    setSelectedStudent(student)
   }
 
   const handleAdd = () => {
-    setSelectedTeacher(null)
-    setModalAction('edit')
-    setModalOpen(true)
+    // Placeholder for teacher creation functionality
+    alert('Teacher creation functionality will be implemented')
   }
 
-  const handleModalClose = () => {
-    setModalOpen(false)
-    setSelectedTeacher(null)
-    setModalAction('detail')
+  const handleEdit = (teacher: Teacher) => {
+    // Placeholder for teacher edit functionality
+    alert(`Edit teacher: ${teacher.name}`)
   }
 
-  const handleModalConfirm = (updatedTeacher: Teacher) => {
-    let newTeachers: Teacher[]
+  const handleDelete = (teacher: Teacher) => {
+    // Placeholder for teacher delete functionality
+    if (window.confirm(`Delete teacher: ${teacher.name}?`)) {
+      alert(`Teacher ${teacher.name} deleted`)
+    }
+  }
 
-    if (modalAction === 'delete') {
-      // Delete functionality
-      newTeachers = teachers.filter((t) => t.id !== updatedTeacher.id)
-      setTeachers(newTeachers)
-      addToast(
-        `"${updatedTeacher.name}" teacher was successfully deleted`,
-        'success'
-      )
-      // TODO: Backend API call to delete teacher
-      // await api.deleteTeacher(updatedTeacher.id)
-    } else if (modalAction === 'edit') {
-      if (selectedTeacher) {
-        // Edit existing teacher
-        newTeachers = teachers.map((t) =>
-          t.id === updatedTeacher.id ? updatedTeacher : t
+  const handleDetail = (teacher: Teacher) => {
+    // Placeholder for teacher detail functionality
+    alert(`Teacher details: ${teacher.name}`)
+  }
+
+  const handleTeacherSelect = (teacher: Teacher) => {
+    setSelectedTeacherForGroups(teacher)
+    setViewState('groups')
+  }
+
+  const createMockStudentsForGroup = (groupId: number, count: number) => {
+    const firstNames = [
+      'Ali',
+      'Dilnoza',
+      'Bekzod',
+      'Malika',
+      'Javlon',
+      'Sardor',
+      'Nodira',
+      'Aziz',
+      'Gulnara',
+      'Rustam',
+      'Zarina',
+      'Bobur',
+      'Kamola',
+      'Farrux',
+      'Laylo',
+      'Bahodir',
+      'Munira',
+      'Jahongir',
+      'Dildora',
+      'Shukurullo',
+    ]
+    const lastNames = [
+      'Karimov',
+      'Saidova',
+      'Toshmatov',
+      'Xolmatova',
+      'Umarov',
+      'Rahimov',
+      'Bekova',
+      'Nazarov',
+      'Karimova',
+      'Alimov',
+      'Tosheva',
+      'Akbarov',
+      'Umarova',
+      'Saidov',
+      'Hamroqulova',
+      'Ruziev',
+      'Azizova',
+      'Otajonov',
+      'Alikulova',
+      'Tursunov',
+    ]
+
+    const mockStudentsList = []
+    const startId = groupId * 100
+
+    for (let i = 0; i < count; i++) {
+      const firstName =
+        firstNames[Math.floor(Math.random() * firstNames.length)]
+      const lastName = lastNames[Math.floor(Math.random() * lastNames.length)]
+      const attendanceStatuses = ['present', 'late', 'absent']
+      const attendance =
+        attendanceStatuses[
+          Math.floor(Math.random() * attendanceStatuses.length)
+        ]
+
+      mockStudentsList.push({
+        id: startId + i,
+        name: `${firstName} ${lastName}`,
+        phone: `+998 ${90 + Math.floor(Math.random() * 6)} ${Math.floor(
+          Math.random() * 100000000
         )
-        setTeachers(newTeachers)
-        addToast(
-          `"${updatedTeacher.name}" teacher information was successfully updated`,
-          'success'
-        )
-        // TODO: Backend API call to update teacher
-        // await api.updateTeacher(updatedTeacher.id, updatedTeacher)
-      } else {
-        // Add new teacher
-        const newTeacher = {
-          ...updatedTeacher,
-          id: Math.max(...teachers.map((t) => t.id)) + 1,
-        }
-        newTeachers = [...teachers, newTeacher]
-        setTeachers(newTeachers)
-        addToast(
-          `"${updatedTeacher.name}" teacher was successfully added`,
-          'success'
-        )
-      }
-    } else {
-      newTeachers = teachers
+          .toString()
+          .padStart(8, '0')}`,
+        attendance: attendance as 'present' | 'late' | 'absent',
+        activity: 70 + Math.floor(Math.random() * 30),
+      })
     }
 
-    // Save to localStorage
-    localStorage.setItem('teachers', JSON.stringify(newTeachers))
-    handleModalClose()
+    return mockStudentsList
   }
 
   return (
@@ -433,225 +885,1062 @@ export default function TeachersPage() {
             letterSpacing: '0.05em',
           }}
         >
-          MAIN / <span style={{ color: '#e11d48' }}>TEACHERS</span>
+          <Link to='/'>Dashboard</Link> /{' '}
+          <span style={{ color: '#e11d48' }}>
+            {viewState === 'teachers' && 'TEACHERS'}
+            {viewState === 'groups' && 'TEACHER GROUPS'}
+            {viewState === 'students' && 'GROUP STUDENTS'}
+          </span>
         </div>
 
-        <div style={{ padding: '12px 32px 24px' }}>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <h1
+        {/* Teachers View */}
+        {viewState === 'teachers' && (
+          <>
+            <div style={{ padding: '12px 32px 24px' }}>
+              <div
                 style={{
-                  fontSize: 28,
-                  fontWeight: 800,
-                  color: '#0f172a',
-                  letterSpacing: '-0.02em',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
                 }}
               >
-                Teacher Team
-              </h1>
-              <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>
-                LinguaPro qualified teachers management panel
-              </p>
+                <div>
+                  <h1
+                    style={{
+                      fontSize: 28,
+                      fontWeight: 800,
+                      color: '#0f172a',
+                      letterSpacing: '-0.02em',
+                    }}
+                  >
+                    Teacher Team
+                  </h1>
+                  <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>
+                    LinguaPro qualified teachers management panel
+                  </p>
+                </div>
+                <Button
+                  onClick={handleAdd}
+                  style={{
+                    background: '#e11d48',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '12px 24px',
+                    borderRadius: 25,
+                    fontWeight: 600,
+                    fontSize: 14,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    boxShadow: '0 4px 12px rgba(225, 29, 72, 0.15)',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = '#be123c'
+                    e.currentTarget.style.transform = 'translateY(-1px)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = '#e11d48'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                  }}
+                >
+                  <svg
+                    width={16}
+                    height={16}
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    stroke='currentColor'
+                    strokeWidth={2.5}
+                  >
+                    <line x1='12' y1='5' x2='12' y2='19' />
+                    <line x1='5' y1='12' x2='19' y2='12' />
+                  </svg>
+                  New Teacher
+                </Button>
+              </div>
             </div>
-            <button
-              onClick={handleAdd}
+
+            <div
               style={{
-                background: '#e11d48',
-                color: '#fff',
-                border: 'none',
-                padding: '12px 24px',
-                borderRadius: 12,
-                fontWeight: 600,
-                fontSize: 14,
-                cursor: 'pointer',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                gap: 20,
+                padding: '0 32px',
+              }}
+            >
+              {teachers.map((teacher) => (
+                <TeacherCard
+                  key={teacher.id}
+                  teacher={teacher}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onDetail={handleDetail}
+                  onClick={handleTeacherSelect}
+                />
+              ))}
+            </div>
+
+            {/* KPI Section */}
+            <div
+              style={{
+                margin: '40px 32px',
+                background: 'linear-gradient(135deg, #e11d48 0%, #9f1239 100%)',
+                borderRadius: 24,
+                padding: '32px',
                 display: 'flex',
+                gap: 40,
                 alignItems: 'center',
-                gap: 8,
-                boxShadow: '0 4px 12px rgba(225, 29, 72, 0.15)',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#be123c'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#e11d48'
-                e.currentTarget.style.transform = 'translateY(0)'
+                color: '#fff',
+                flexWrap: 'wrap',
+                boxShadow: '0 20px 25px -5px rgba(225, 29, 72, 0.15)',
               }}
             >
-              <svg
-                width={16}
-                height={16}
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth={2.5}
-              >
-                <line x1='12' y1='5' x2='12' y2='19' />
-                <line x1='5' y1='12' x2='19' y2='12' />
-              </svg>
-              New Teacher
-            </button>
-          </div>
-        </div>
+              <div style={{ flex: 1, minWidth: 300 }}>
+                <h2
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: '600',
+                    marginBottom: '16px',
+                  }}
+                >
+                  Add New Student
+                </h2>
+                <p
+                  style={{
+                    fontSize: 14,
+                    opacity: 0.9,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Add new student to the group
+                </p>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                  <Input
+                    value={newStudent.name}
+                    onChange={(e) =>
+                      setNewStudent((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
+                    placeholder='e.g., John Smith'
+                    required
+                  />
+                </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-            gap: 20,
-            padding: '0 32px',
-          }}
-        >
-          {teachers.map((teacher) => (
-            <TeacherCard
-              key={teacher.id}
-              teacher={teacher}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onDetail={handleDetail}
-            />
-          ))}
-        </div>
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '4px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                    }}
+                  >
+                    Phone Number
+                  </label>
+                  <Input
+                    value={newStudent.phone}
+                    onChange={(e) =>
+                      setNewStudent((prev) => ({
+                        ...prev,
+                        phone: e.target.value,
+                      }))
+                    }
+                    placeholder='e.g., +998 90 123 45 67'
+                    required
+                  />
+                </div>
 
-        {/* KPI Section */}
-        <div
-          style={{
-            margin: '40px 32px',
-            background: 'linear-gradient(135deg, #e11d48 0%, #9f1239 100%)',
-            borderRadius: 24,
-            padding: '32px',
-            display: 'flex',
-            gap: 40,
-            alignItems: 'center',
-            color: '#fff',
-            flexWrap: 'wrap',
-            boxShadow: '0 20px 25px -5px rgba(225, 29, 72, 0.15)',
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 300 }}>
-            <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 12 }}>
-              Teachers Rating & KPI
-            </h2>
-            <p
-              style={{
-                fontSize: 14,
-                opacity: 0.9,
-                lineHeight: 1.6,
-                maxWidth: 450,
-              }}
-            >
-              {kpiData.description}
-            </p>
-            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-              <button
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '4px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                    }}
+                  >
+                    Attendance
+                  </label>
+                  <select
+                    value={newStudent.attendance}
+                    onChange={(e) =>
+                      setNewStudent((prev) => ({
+                        ...prev,
+                        attendance: e.target.value,
+                      }))
+                    }
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                    }}
+                  >
+                    <option value='present'>Present</option>
+                    <option value='late'>Late</option>
+                    <option value='absent'>Absent</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    style={{
+                      display: 'block',
+                      marginBottom: '4px',
+                      fontSize: '14px',
+                      fontWeight: '600',
+                    }}
+                  >
+                    Activity (%)
+                  </label>
+                  <Input
+                    type='number'
+                    min='0'
+                    max='100'
+                    value={newStudent.activity}
+                    onChange={(e) =>
+                      setNewStudent((prev) => ({
+                        ...prev,
+                        activity: parseInt(e.target.value) || 0,
+                      }))
+                    }
+                    placeholder='0-100'
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    onClick={() => setAddStudentModalOpen(false)}
+                    style={{ flex: 1 }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type='submit'
+                    style={{
+                      flex: 1,
+                      background: '#e11d48',
+                      color: '#fff',
+                      border: 'none',
+                    }}
+                  >
+                    Add Student
+                  </Button>
+                </div>
+              </div>
+
+              <div
                 style={{
-                  background: '#fff',
-                  color: '#e11d48',
-                  border: 'none',
-                  padding: '10px 20px',
-                  borderRadius: 12,
-                  fontWeight: 600,
-                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 20,
+                  minWidth: 200,
                 }}
-              >
-                Hisobotni ko'rish
-              </button>
-              <button
-                style={{
-                  background: 'rgba(255,255,255,0.15)',
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  padding: '10px 20px',
-                  borderRadius: 12,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                Bonus tizimi
-              </button>
+              ></div>
             </div>
-          </div>
+          </>
+        )}
 
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 20,
-              minWidth: 200,
-            }}
-          >
-            <KpiStat
-              label='Total teachers'
-              value={`${kpiData.totalTeachers} ta`}
-              percent={60}
-            />
-            <KpiStat
-              label='Active groups'
-              value={`${kpiData.activeGroups} ta`}
-              percent={86}
-            />
-          </div>
-        </div>
+        {/* Groups View */}
+        {viewState === 'groups' && selectedTeacherForGroups && (
+          <>
+            <div className='container mx-auto space-y-6 p-6'>
+              <div className='mb-6'>
+                <div className='mb-2 flex items-center gap-4'>
+                  <Button
+                    onClick={() => setViewState('teachers')}
+                    style={{
+                      background: '#e11d48',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: 25,
+                      fontWeight: 600,
+                      fontSize: 14,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      boxShadow: '0 4px 12px rgba(225, 29, 72, 0.15)',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#be123c'
+                      e.currentTarget.style.transform = 'translateY(-1px)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#e11d48'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    ← Back
+                  </Button>
+                  <h1 className='text-3xl font-bold'>
+                    {selectedTeacherForGroups.name} - Groups
+                  </h1>
+                </div>
+                <p className='text-muted-foreground'>
+                  Select a group and view student list
+                </p>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <div className='flex items-center justify-between'>
+                    <CardTitle>Groups List</CardTitle>
+                    <Button
+                      onClick={() => setGroupModalOpen(true)}
+                      style={{
+                        background: '#e11d48',
+                        color: '#fff',
+                        border: 'none',
+                        padding: '12px 24px',
+                        borderRadius: 25,
+                        fontWeight: 600,
+                        fontSize: 14,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        boxShadow: '0 4px 12px rgba(225, 29, 72, 0.15)',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#be123c'
+                        e.currentTarget.style.transform = 'translateY(-1px)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = '#e11d48'
+                        e.currentTarget.style.transform = 'translateY(0)'
+                      }}
+                    >
+                      <svg
+                        width={16}
+                        height={16}
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        stroke='currentColor'
+                        strokeWidth={2.5}
+                      >
+                        <line x1='12' y1='5' x2='12' y2='19' />
+                        <line x1='5' y1='12' x2='19' y2='12' />
+                      </svg>
+                      + Add Group
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className='p-0'>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Group Name</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Schedule</TableHead>
+                        <TableHead>Room</TableHead>
+                        <TableHead>Students</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {getFilteredGroups().map((group) => (
+                        <TableRow key={group.id}>
+                          <TableCell className='font-medium'>
+                            <div className='flex items-center gap-3'>
+                              <div className='flex h-10 w-10 items-center justify-center rounded-full bg-green-100'>
+                                <Users className='h-5 w-5 text-green-600' />
+                              </div>
+                              <div>
+                                <div className='font-semibold'>
+                                  {group.name}
+                                </div>
+                                <div className='text-sm text-gray-500'>
+                                  {selectedTeacherForGroups.name}
+                                </div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <div className='font-medium'>
+                                {group.description}
+                              </div>
+                              <div className='text-sm text-gray-500'>
+                                {group.schedule}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className='flex items-center gap-2'>
+                              <Calendar className='h-4 w-4 text-gray-500' />
+                              <span>{group.schedule}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className='flex items-center gap-2'>
+                              <MapPin className='h-4 w-4 text-gray-500' />
+                              <span>Room {group.room}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className='text-center'>
+                              <div className='font-semibold'>
+                                {group.students}
+                              </div>
+                              <div className='text-sm text-gray-500'>
+                                students
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className='flex gap-2'>
+                              <Button
+                                size='sm'
+                                variant='outline'
+                                onClick={() => handleGroupSelect(group)}
+                              >
+                                <Users className='h-3 w-3' />
+                              </Button>
+                              <Button size='sm' variant='outline'>
+                                <Edit className='h-3 w-3' />
+                              </Button>
+                              <Button size='sm' variant='outline'>
+                                <Trash2 className='h-3 w-3' />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
+
+        {/* Students View */}
+        {viewState === 'students' && selectedGroup && (
+          <>
+            <div className='container mx-auto space-y-6 p-6'>
+              <div className='mb-6'>
+                <div className='mb-2 flex items-center gap-4'>
+                  <Button
+                    onClick={() => setViewState('groups')}
+                    style={{
+                      background: '#e11d48',
+                      color: '#fff',
+                      border: 'none',
+                      padding: '10px 20px',
+                      borderRadius: 25,
+                      fontWeight: 600,
+                      fontSize: 14,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      boxShadow: '0 4px 12px rgba(225, 29, 72, 0.15)',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#be123c'
+                      e.currentTarget.style.transform = 'translateY(-1px)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#e11d48'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    ← Back
+                  </Button>
+                  <h1 className='text-3xl font-bold'>
+                    {selectedGroup.name} - Students
+                  </h1>
+                </div>
+                <p className='text-muted-foreground'>
+                  Manage student attendance
+                </p>
+              </div>
+
+              <div style={{ padding: '0 16px' }}>
+                <div
+                  style={{
+                    background: '#fff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: '16px 20px',
+                      borderBottom: '1px solid #e5e7eb',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <h3
+                      style={{ fontSize: '18px', fontWeight: '600', margin: 0 }}
+                    >
+                      Students List
+                    </h3>
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: '12px',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <div className='relative'>
+                        <SearchIcon className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400' />
+                        <Input
+                          placeholder='Search...'
+                          className='w-64 pl-10'
+                          value={searchTerm}
+                          onChange={(e) => {
+                            const value = e.target.value
+                            setSearchTerm(value)
+                            handleSearchStudents(value)
+                          }}
+                        />
+                      </div>
+                      <Button
+                        onClick={() => setAddStudentModalOpen(true)}
+                        style={{
+                          background: '#e11d48',
+                          color: '#fff',
+                          border: 'none',
+                          padding: '10px 20px',
+                          borderRadius: 25,
+                          fontWeight: 600,
+                          fontSize: 14,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 8,
+                          boxShadow: '0 4px 12px rgba(225, 29, 72, 0.15)',
+                          transition: 'all 0.2s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = '#be123c'
+                          e.currentTarget.style.transform = 'translateY(-1px)'
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = '#e11d48'
+                          e.currentTarget.style.transform = 'translateY(0)'
+                        }}
+                      >
+                        <svg
+                          width={16}
+                          height={16}
+                          viewBox='0 0 24 24'
+                          fill='none'
+                          stroke='currentColor'
+                          strokeWidth={2.5}
+                        >
+                          <line x1='12' y1='5' x2='12' y2='19' />
+                          <line x1='5' y1='12' x2='19' y2='12' />
+                        </svg>
+                        Add Student
+                      </Button>
+                    </div>
+                  </div>
+
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: '#f8fafc' }}>
+                        <th
+                          style={{
+                            padding: '12px 16px',
+                            textAlign: 'left',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            color: '#64748b',
+                            borderBottom: '1px solid #e5e7eb',
+                          }}
+                        >
+                          Name
+                        </th>
+                        <th
+                          style={{
+                            padding: '12px 16px',
+                            textAlign: 'left',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            color: '#64748b',
+                            borderBottom: '1px solid #e5e7eb',
+                          }}
+                        >
+                          Phone
+                        </th>
+                        <th
+                          style={{
+                            padding: '12px 16px',
+                            textAlign: 'left',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            color: '#64748b',
+                            borderBottom: '1px solid #e5e7eb',
+                          }}
+                        >
+                          Attendance
+                        </th>
+                        <th
+                          style={{
+                            padding: '12px 16px',
+                            textAlign: 'left',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            color: '#64748b',
+                            borderBottom: '1px solid #e5e7eb',
+                          }}
+                        >
+                          Activity
+                        </th>
+                        <th
+                          style={{
+                            padding: '12px 16px',
+                            textAlign: 'left',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            color: '#64748b',
+                            borderBottom: '1px solid #e5e7eb',
+                          }}
+                        >
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {students.map((student, _index) => (
+                        <tr
+                          key={student.id}
+                          style={{ borderBottom: '1px solid #f1f5f9' }}
+                        >
+                          <td
+                            style={{
+                              padding: '12px 16px',
+                              fontSize: '14px',
+                              fontWeight: '500',
+                            }}
+                          >
+                            {student.name}
+                          </td>
+                          <td
+                            style={{
+                              padding: '12px 16px',
+                              fontSize: '14px',
+                              color: '#64748b',
+                            }}
+                          >
+                            {student.phone}
+                          </td>
+                          <td style={{ padding: '8px 16px' }}>
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                              <button
+                                onClick={() =>
+                                  handleAttendanceChange(student.id, 'present')
+                                }
+                                style={{
+                                  padding: '4px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '500',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  background:
+                                    student.attendance === 'present'
+                                      ? '#22c55e'
+                                      : '#f1f5f9',
+                                  color:
+                                    student.attendance === 'present'
+                                      ? '#fff'
+                                      : '#64748b',
+                                }}
+                              >
+                                Present
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleAttendanceChange(student.id, 'late')
+                                }
+                                style={{
+                                  padding: '4px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '500',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  background:
+                                    student.attendance === 'late'
+                                      ? '#f59e0b'
+                                      : '#f1f5f9',
+                                  color:
+                                    student.attendance === 'late'
+                                      ? '#fff'
+                                      : '#64748b',
+                                }}
+                              >
+                                Late
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleAttendanceChange(student.id, 'absent')
+                                }
+                                style={{
+                                  padding: '4px 8px',
+                                  borderRadius: '6px',
+                                  fontSize: '12px',
+                                  fontWeight: '500',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  background:
+                                    student.attendance === 'absent'
+                                      ? '#ef4444'
+                                      : '#f1f5f9',
+                                  color:
+                                    student.attendance === 'absent'
+                                      ? '#fff'
+                                      : '#64748b',
+                                }}
+                              >
+                                Absent
+                              </button>
+                            </div>
+                          </td>
+                          <td style={{ padding: '12px 16px' }}>
+                            <button
+                              onClick={() => handleStudentActivity(student)}
+                              style={{
+                                padding: '6px',
+                                borderRadius: '6px',
+                                border: '1px solid #e5e7eb',
+                                background: '#fff',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}
+                            >
+                              <TrendingUp className='h-4 w-4' />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Student Activity Modal/Card */}
+              {selectedStudent && (
+                <Card className='border-blue-200 bg-blue-50'>
+                  <CardContent className='p-6'>
+                    <div className='mb-4 flex items-center justify-between'>
+                      <h3 className='text-lg font-semibold'>
+                        {selectedStudent.name} - Activity
+                      </h3>
+                      <Button
+                        size='sm'
+                        variant='outline'
+                        onClick={() => setSelectedStudent(null)}
+                      >
+                        ×
+                      </Button>
+                    </div>
+                    <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+                      <div className='text-center'>
+                        <div className='text-3xl font-bold text-blue-600'>
+                          {selectedStudent.activity}%
+                        </div>
+                        <p className='text-sm text-gray-600'>
+                          Overall Activity
+                        </p>
+                      </div>
+                      <div className='text-center'>
+                        <div className='text-2xl font-bold text-green-600'>
+                          24/30
+                        </div>
+                        <p className='text-sm text-gray-600'>
+                          Class Attendance
+                        </p>
+                      </div>
+                      <div className='text-center'>
+                        <div className='text-2xl font-bold text-purple-600'>
+                          A+
+                        </div>
+                        <p className='text-sm text-gray-600'>Grade</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Summary Cards */}
+              <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
+                <Card>
+                  <CardContent className='p-6'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-sm text-gray-600'>
+                          Average Attendance
+                        </p>
+                        <p className='text-2xl font-bold text-green-600'>
+                          {Math.round(
+                            (students.filter((s) => s.attendance === 'present')
+                              .length /
+                              students.length) *
+                              100
+                          )}
+                          %
+                        </p>
+                      </div>
+                      <div className='flex h-12 w-12 items-center justify-center rounded-full bg-green-100'>
+                        <Users className='h-6 w-6 text-green-600' />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className='p-6'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-sm text-gray-600'>
+                          Most Active Student
+                        </p>
+                        <p className='text-lg font-semibold'>
+                          {
+                            students
+                              .reduce((prev, current) =>
+                                prev.activity > current.activity
+                                  ? prev
+                                  : current
+                              )
+                              .name.split(' ')[0]
+                          }
+                          .
+                        </p>
+                      </div>
+                      <div className='flex h-12 w-12 items-center justify-center rounded-full bg-blue-100'>
+                        <Users className='h-6 w-6 text-blue-600' />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className='p-6'>
+                    <div className='flex items-center justify-between'>
+                      <div>
+                        <p className='text-sm text-gray-600'>Total Classes</p>
+                        <p className='text-2xl font-bold'>24/48</p>
+                      </div>
+                      <div className='flex h-12 w-12 items-center justify-center rounded-full bg-purple-100'>
+                        <Calendar className='h-6 w-6 text-purple-600' />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </>
+        )}
       </Main>
 
-      {/* Modal */}
-      <TeacherModal
-        key={modalAction}
-        teacher={selectedTeacher}
-        isOpen={modalOpen}
-        onClose={handleModalClose}
-        action={modalAction}
-        onConfirm={handleModalConfirm}
+      {/* Group Modal */}
+      <GroupModal
+        isOpen={groupModalOpen}
+        onClose={() => setGroupModalOpen(false)}
+        onAddGroup={handleAddGroup}
+        newGroup={newGroup}
+        setNewGroup={setNewGroup}
       />
+
+      {/* Add Student Modal */}
+      {addStudentModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setAddStudentModalOpen(false)}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '12px',
+              padding: '24px',
+              width: '90%',
+              maxWidth: '500px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              style={{
+                fontSize: '20px',
+                fontWeight: '600',
+                marginBottom: '16px',
+              }}
+            >
+              Add New Student
+            </h2>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                handleAddStudent()
+              }}
+              style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+            >
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '4px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Name *
+                </label>
+                <Input
+                  value={newStudent.name}
+                  onChange={(e) =>
+                    setNewStudent((prev) => ({ ...prev, name: e.target.value }))
+                  }
+                  placeholder='e.g., John Smith'
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '4px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Phone Number *
+                </label>
+                <Input
+                  value={newStudent.phone}
+                  onChange={(e) =>
+                    setNewStudent((prev) => ({
+                      ...prev,
+                      phone: e.target.value,
+                    }))
+                  }
+                  placeholder='e.g., +998 90 123 45 67'
+                  required
+                />
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '4px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Attendance
+                </label>
+                <select
+                  value={newStudent.attendance}
+                  onChange={(e) =>
+                    setNewStudent((prev) => ({
+                      ...prev,
+                      attendance: e.target.value,
+                    }))
+                  }
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                  }}
+                >
+                  <option value='present'>Present</option>
+                  <option value='late'>Late</option>
+                  <option value='absent'>Absent</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  style={{
+                    display: 'block',
+                    marginBottom: '4px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}
+                >
+                  Activity (%)
+                </label>
+                <Input
+                  type='number'
+                  min='0'
+                  max='100'
+                  value={newStudent.activity}
+                  onChange={(e) =>
+                    setNewStudent((prev) => ({
+                      ...prev,
+                      activity: parseInt(e.target.value) || 0,
+                    }))
+                  }
+                  placeholder='0-100'
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => setAddStudentModalOpen(false)}
+                  style={{ flex: 1 }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type='submit'
+                  style={{
+                    flex: 1,
+                    background: '#e11d48',
+                    color: '#fff',
+                    border: 'none',
+                  }}
+                >
+                  Add Student
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Toast */}
       <ToastContainer />
     </>
-  )
-}
-
-function KpiStat({
-  label,
-  value,
-  percent,
-}: {
-  label: string
-  value: string
-  percent: number
-}) {
-  return (
-    <div style={{ width: '100%' }}>
-      <div
-        style={{ fontSize: 12, opacity: 0.8, marginBottom: 6, fontWeight: 500 }}
-      >
-        {label}
-      </div>
-      <div style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>
-        {value}
-      </div>
-      <div
-        style={{
-          height: 6,
-          background: 'rgba(255,255,255,0.2)',
-          borderRadius: 10,
-        }}
-      >
-        <div
-          style={{
-            width: `${percent}%`,
-            height: '100%',
-            background: '#fff',
-            borderRadius: 10,
-          }}
-        />
-      </div>
-    </div>
   )
 }
