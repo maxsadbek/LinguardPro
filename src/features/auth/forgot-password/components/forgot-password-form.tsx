@@ -55,10 +55,15 @@ export function ForgotPasswordForm({
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
+    const fullPhoneNumber = `+998${data.phone}`
+
     navigate({
       to: '/verify-page',
       search: { username: data.username },
     })
+
+    // Keyingi API yuborishda telefon shu ko'rinishda ishlatiladi: +998901234567
+    void fullPhoneNumber
     setIsLoading(false)
   }
 
@@ -97,7 +102,7 @@ export function ForgotPasswordForm({
               <FormLabel>Telefon raqami</FormLabel>
               <FormControl>
                 <div className='flex items-center rounded-md border border-input bg-transparent shadow-xs transition-all focus-within:border-[#C70C3D] focus-within:ring-2 focus-within:ring-[#C70C3D]/30'>
-                  <span className='border-r border-input px-3 text-sm text-muted-foreground'>
+                  <span className='border-r border-input px-3 text-sm font-medium text-foreground'>
                     +998
                   </span>
                   <Input
