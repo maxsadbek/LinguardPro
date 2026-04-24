@@ -15,15 +15,25 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import {
+  PHONE_DIGITS_REGEX,
+  USERNAME_REGEX,
+  formatPhoneDigits,
+  sanitizePhoneDigits,
+  sanitizeUsername,
+} from '../../validators'
 
 const formSchema = z.object({
-  username: z.string().min(1, 'Username ni kiriting'),
+  username: z
+    .string()
+    .min(1, 'Foydalanuvchi nomini kiriting')
+    .regex(
+      USERNAME_REGEX,
+      "Foydalanuvchi nomi 3 tadan 20 tagacha lotin harfi, raqam yoki pastki chiziqdan iborat bo'lsin"
+    ),
   phone: z
     .string()
-    .regex(
-      /^\+998(?: \d{2}){1,4}$/,
-      'Telefon format: +998 90 123 45 67'
-    ),
+    .regex(PHONE_DIGITS_REGEX, "Telefon raqamida +998 dan keyin 9 ta son bo'lsin"),
 })
 
 export function ForgotPasswordForm({
@@ -39,41 +49,22 @@ export function ForgotPasswordForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: '',
-      phone: '+998 ',
+      phone: '',
     },
   })
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
+    const fullPhoneNumber = `+998${data.phone}`
+
     navigate({
-      to: '/verify-password',
+      to: '/verify-page',
       search: { username: data.username },
     })
+
+    // Keyingi API yuborishda telefon shu ko'rinishda ishlatiladi: +998901234567
+    void fullPhoneNumber
     setIsLoading(false)
-  }
-
-  const formatPhone = (value: string) => {
-    let numbers = value.replace(/\D/g, '')
-
-    if (!numbers.startsWith('998')) {
-      numbers = '998'
-    }
-
-    numbers = numbers.slice(0, 12)
-
-    const part1 = numbers.slice(3, 5)
-    const part2 = numbers.slice(5, 8)
-    const part3 = numbers.slice(8, 10)
-    const part4 = numbers.slice(10, 12)
-
-    let result = '+998'
-
-    if (part1) result += ` ${part1}`
-    if (part2) result += ` ${part2}`
-    if (part3) result += ` ${part3}`
-    if (part4) result += ` ${part4}`
-
-    return result
   }
 
   return (
@@ -88,12 +79,14 @@ export function ForgotPasswordForm({
           name='username'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Foydalanuvchi nomi</FormLabel>
               <FormControl>
                 <Input
-                  placeholder='Username kiriting'
+                  placeholder='Foydalanuvchi nomini kiriting'
                   className={focusInputStyle}
+                  maxLength={20}
                   {...field}
+                  onChange={(e) => field.onChange(sanitizeUsername(e.target.value))}
                 />
               </FormControl>
               <FormMessage />
@@ -106,14 +99,25 @@ export function ForgotPasswordForm({
           name='phone'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone</FormLabel>
+              <FormLabel>Telefon raqami</FormLabel>
               <FormControl>
-                <Input
-                  value={field.value}
-                  className={focusInputStyle}
-                  placeholder='+998 90 123 45 67'
-                  onChange={(e) => field.onChange(formatPhone(e.target.value))}
-                />
+                <div className='flex items-center rounded-md border border-input bg-transparent shadow-xs transition-all focus-within:border-[#C70C3D] focus-within:ring-2 focus-within:ring-[#C70C3D]/30'>
+                  <span className='border-r border-input px-3 text-sm font-medium text-foreground'>
+                    +998
+                  </span>
+                  <Input
+                    value={formatPhoneDigits(field.value)}
+                    inputMode='numeric'
+                    className={cn(
+                      'border-0 shadow-none focus:border-0 focus:ring-0 focus-visible:ring-0',
+                      focusInputStyle
+                    )}
+                    placeholder='90-123-45-67'
+                    onChange={(e) =>
+                      field.onChange(sanitizePhoneDigits(e.target.value))
+                    }
+                  />
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -130,7 +134,7 @@ export function ForgotPasswordForm({
           ) : (
             <ArrowRight className='mr-2 h-4 w-4' />
           )}
-          Continue
+          Davom etish
         </Button>
       </form>
     </Form>
