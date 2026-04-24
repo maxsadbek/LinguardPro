@@ -3,10 +3,8 @@ import {
   LayoutDashboard,
   Users,
   ClipboardCheck,
-  BarChart3,
   BookOpen,
   MessageSquare,
-  Megaphone,
 } from 'lucide-react'
 
 const navItems = [
@@ -26,11 +24,6 @@ const navItems = [
     icon: ClipboardCheck,
   },
   {
-    label: 'Results',
-    to: '/teacher-dashboard/results',
-    icon: BarChart3,
-  },
-  {
     label: 'Homework',
     to: '/teacher-dashboard/homework',
     icon: BookOpen,
@@ -39,11 +32,6 @@ const navItems = [
     label: 'Messages',
     to: '/teacher-dashboard/messages',
     icon: MessageSquare,
-  },
-  {
-    label: 'Announcements',
-    to: '/teacher-dashboard/announcements',
-    icon: Megaphone,
   },
 ] as const
 
