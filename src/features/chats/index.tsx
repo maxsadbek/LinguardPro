@@ -1,18 +1,18 @@
-import { useState } from 'react'
+import { type FormEvent, useRef, useState } from 'react'
 import { Fragment } from 'react/jsx-runtime'
 import { format } from 'date-fns'
 import {
   ArrowLeft,
-  MoreVertical,
   Edit,
+  ImagePlus,
+  MessagesSquare,
+  MoreVertical,
   Paperclip,
   Phone,
-  ImagePlus,
   Plus,
   Search as SearchIcon,
   Send,
   Video,
-  MessagesSquare,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -32,21 +32,30 @@ import { conversations } from './data/convo.json'
 
 export function Chats() {
   const [search, setSearch] = useState('')
-  const [selectedUser, setSelectedUser] = useState<ChatUser | null>(null)
+  const [chatList, setChatList] = useState<ChatUser[]>(conversations)
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const [mobileSelectedUser, setMobileSelectedUser] = useState<ChatUser | null>(
     null
   )
   const [createConversationDialogOpened, setCreateConversationDialog] =
     useState(false)
 
+  const [messageText, setMessageText] = useState('')
+  const imageInputRef = useRef<HTMLInputElement | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
   // Filtered data based on the search query
-  const filteredChatList = conversations.filter(({ fullName }) =>
+  const filteredChatList = chatList.filter(({ fullName }) =>
     fullName.toLowerCase().includes(search.trim().toLowerCase())
   )
 
+  const selectedUser = selectedUserId
+    ? (chatList.find((u) => u.id === selectedUserId) ?? null)
+    : null
+
   const currentMessage = selectedUser?.messages.reduce(
     (acc: Record<string, Convo[]>, obj) => {
-      const key = format(obj.timestamp, 'd MMM, yyyy')
+      const key = format(new Date(obj.timestamp), 'd MMM, yyyy')
 
       // Create an array for the category if it doesn't exist
       if (!acc[key]) {
@@ -62,6 +71,39 @@ export function Chats() {
   )
 
   const users = conversations.map(({ messages, ...user }) => user)
+
+  const handleSendMessage = (payload: { message: string }) => {
+    if (!selectedUser) return
+    const nextMessage: Convo = {
+      sender: 'You',
+      message: payload.message,
+      timestamp: new Date().toISOString(),
+    }
+
+    setChatList((prev) =>
+      prev.map((u) =>
+        u.id === selectedUser.id
+          ? { ...u, messages: [nextMessage, ...u.messages] }
+          : u
+      )
+    )
+  }
+
+  const handleSubmitText = (e: FormEvent) => {
+    e.preventDefault()
+    const trimmed = messageText.trim()
+    if (!trimmed) return
+    handleSendMessage({ message: trimmed })
+    setMessageText('')
+  }
+
+  const handlePickImage = () => {
+    imageInputRef.current?.click()
+  }
+
+  const handlePickFile = () => {
+    fileInputRef.current?.click()
+  }
 
   return (
     <>
@@ -127,10 +169,11 @@ export function Chats() {
                       className={cn(
                         'group hover:bg-accent hover:text-accent-foreground',
                         `flex w-full rounded-md px-2 py-2 text-start text-sm`,
-                        selectedUser?.id === id && 'sm:bg-muted'
+                        selectedUserId === id &&
+                          'bg-rose-100 text-foreground ring-1 ring-rose-200 dark:bg-rose-500/15 dark:ring-rose-500/25'
                       )}
                       onClick={() => {
-                        setSelectedUser(chatUsr)
+                        setSelectedUserId(chatUsr.id)
                         setMobileSelectedUser(chatUsr)
                       }}
                     >
@@ -235,19 +278,27 @@ export function Chats() {
                                 className={cn(
                                   'chat-box max-w-72 px-3 py-2 wrap-break-word shadow-lg',
                                   msg.sender === 'You'
-                                    ? 'self-end rounded-[16px_16px_0_16px] bg-primary/90 text-primary-foreground/75'
-                                    : 'self-start rounded-[16px_16px_16px_0] bg-muted'
+                                    ? 'self-end rounded-[16px_16px_0_16px] bg-rose-600 text-white'
+                                    : 'self-start rounded-[16px_16px_16px_0] bg-card text-foreground ring-1 ring-border'
                                 )}
                               >
-                                {msg.message}{' '}
+                                {msg.message.startsWith('data:image') ? (
+                                  <img
+                                    src={msg.message}
+                                    alt='uploaded'
+                                    className='max-w-full rounded-md'
+                                  />
+                                ) : (
+                                  <>{msg.message} </>
+                                )}
                                 <span
                                   className={cn(
-                                    'mt-1 block text-xs font-light text-foreground/75 italic',
+                                    'mt-1 block text-xs font-light text-muted-foreground italic',
                                     msg.sender === 'You' &&
-                                      'text-end text-primary-foreground/85'
+                                      'text-end text-white/80'
                                   )}
                                 >
-                                  {format(msg.timestamp, 'h:mm a')}
+                                  {format(new Date(msg.timestamp), 'h:mm a')}
                                 </span>
                               </div>
                             ))}
@@ -257,7 +308,10 @@ export function Chats() {
                     </div>
                   </div>
                 </div>
-                <form className='flex w-full flex-none gap-2'>
+                <form
+                  className='flex w-full flex-none gap-2'
+                  onSubmit={handleSubmitText}
+                >
                   <div className='flex flex-1 items-center gap-2 rounded-md border border-input bg-card px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:outline-hidden lg:gap-4'>
                     <div className='space-x-1'>
                       <Button
@@ -265,6 +319,7 @@ export function Chats() {
                         type='button'
                         variant='ghost'
                         className='h-8 rounded-md'
+                        onClick={() => setCreateConversationDialog(true)}
                       >
                         <Plus size={20} className='stroke-muted-foreground' />
                       </Button>
@@ -273,6 +328,7 @@ export function Chats() {
                         type='button'
                         variant='ghost'
                         className='hidden h-8 rounded-md lg:inline-flex'
+                        onClick={handlePickImage}
                       >
                         <ImagePlus
                           size={20}
@@ -284,6 +340,7 @@ export function Chats() {
                         type='button'
                         variant='ghost'
                         className='hidden h-8 rounded-md lg:inline-flex'
+                        onClick={handlePickFile}
                       >
                         <Paperclip
                           size={20}
@@ -297,20 +354,55 @@ export function Chats() {
                         type='text'
                         placeholder='Type your messages...'
                         className='h-8 w-full bg-inherit focus-visible:outline-hidden'
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
                       />
                     </label>
                     <Button
                       variant='ghost'
                       size='icon'
                       className='hidden sm:inline-flex'
+                      type='submit'
                     >
                       <Send size={20} />
                     </Button>
                   </div>
-                  <Button className='h-full sm:hidden'>
+                  <Button className='h-full sm:hidden' type='submit'>
                     <Send size={18} /> Send
                   </Button>
                 </form>
+
+                <input
+                  ref={imageInputRef}
+                  type='file'
+                  accept='image/*'
+                  className='hidden'
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    const reader = new FileReader()
+                    reader.onload = () => {
+                      const result = reader.result
+                      if (typeof result === 'string') {
+                        handleSendMessage({ message: result })
+                      }
+                    }
+                    reader.readAsDataURL(file)
+                    e.target.value = ''
+                  }}
+                />
+
+                <input
+                  ref={fileInputRef}
+                  type='file'
+                  className='hidden'
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    handleSendMessage({ message: `Attachment: ${file.name}` })
+                    e.target.value = ''
+                  }}
+                />
               </div>
             </div>
           ) : (

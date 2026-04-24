@@ -1,4 +1,5 @@
 import type { Course } from '@/data/courses-data'
+import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -215,6 +216,100 @@ export function CourseModal({
               <option value='russian'>Rus tili</option>
               <option value='other'>Boshqa</option>
             </select>
+          </div>
+
+          <div>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: '4px',
+                fontSize: '14px',
+                fontWeight: '600',
+              }}
+            >
+              Kurs rasmi
+            </label>
+            <div
+              style={{
+                border: '2px dashed #e2e8f0',
+                borderRadius: '8px',
+                padding: '16px',
+                textAlign: 'center',
+                cursor: 'pointer',
+                transition: 'border-color 0.2s',
+              }}
+              onClick={() => {
+                const input = document.createElement('input')
+                input.type = 'file'
+                input.accept = 'image/*'
+                input.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0]
+                  if (file) {
+                    const reader = new FileReader()
+                    reader.onload = (e) => {
+                      const result = e.target?.result as string
+                      setNewCourse((prev) => ({ ...prev, image: result }))
+                    }
+                    reader.readAsDataURL(file)
+                  }
+                }
+                input.click()
+              }}
+            >
+              {newCourse.image ? (
+                <div>
+                  <img
+                    src={newCourse.image}
+                    alt='Course preview'
+                    style={{
+                      width: '100%',
+                      maxHeight: '120px',
+                      objectFit: 'cover',
+                      borderRadius: '4px',
+                      marginBottom: '8px',
+                    }}
+                  />
+                  <p style={{ fontSize: '12px', color: '#666' }}>
+                    Rasmni almashtirish uchun bosing
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <div
+                    style={{
+                      width: '48px',
+                      height: '48px',
+                      margin: '0 auto 8px',
+                      borderRadius: '50%',
+                      background: '#f3f4f6',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Plus
+                      style={{
+                        width: '24px',
+                        height: '24px',
+                        color: '#9ca3af',
+                      }}
+                    />
+                  </div>
+                  <p
+                    style={{
+                      fontSize: '14px',
+                      color: '#374151',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    Rasm yuklash
+                  </p>
+                  <p style={{ fontSize: '12px', color: '#9ca3af' }}>
+                    PNG, JPG, GIF (max. 5MB)
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>

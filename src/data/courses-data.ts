@@ -20,7 +20,7 @@ export const coursesData: Course[] = [
     image:
       'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=2071&auto=format&fit=crop',
     isBestseller: true,
-    color: '#1e293b',
+    color: '#0f172a',
     category: 'english',
   },
   {
@@ -31,7 +31,7 @@ export const coursesData: Course[] = [
     price: '450,000 UZS / oy',
     image:
       'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071&auto=format&fit=crop',
-    color: '#064e3b',
+    color: '#e11d48',
     category: 'english',
   },
   {
@@ -42,7 +42,7 @@ export const coursesData: Course[] = [
     price: '600,000 UZS / oy',
     image:
       'https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop',
-    color: '#1e3a8a',
+    color: '#1e293b',
     category: 'russian',
   },
   {
@@ -53,7 +53,7 @@ export const coursesData: Course[] = [
     price: '380,000 UZS / oy',
     image:
       'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop',
-    color: '#f1f5f9',
+    color: '#64748b',
     category: 'english',
   },
 ]
