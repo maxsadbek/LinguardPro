@@ -1,24 +1,38 @@
-import { useState } from 'react'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { getCookie } from '@/lib/cookies'
+import { cn } from '@/lib/utils'
+import { LayoutProvider } from '@/context/layout-provider'
+import { SearchProvider } from '@/context/search-provider'
+import { AppSidebar } from '@/components/layout/app-sidebar'
 import { TeacherNavbar } from '@/components/teacher/TeacherNavbar'
-import { TeacherSidebar } from '@/components/teacher/TeacherSidebar'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 export const Route = createFileRoute('/_authenticated/teacher-dashboard')({
   component: TeacherDashboardLayout,
 })
 
 function TeacherDashboardLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const defaultOpen = getCookie('sidebar_state') !== 'false'
 
   return (
-    <div className='flex min-h-svh w-full bg-slate-50'>
-      <TeacherSidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-      <div className='flex min-w-0 flex-1 flex-col'>
-        <TeacherNavbar onMenuClick={() => setSidebarOpen(true)} />
-        <main className='min-w-0 flex-1 px-4 py-4 md:px-8 md:py-6 md:pb-6'>
-          <Outlet />
-        </main>
-      </div>
-    </div>
+    <SearchProvider>
+      <LayoutProvider>
+        <SidebarProvider defaultOpen={defaultOpen}>
+          <AppSidebar />
+          <SidebarInset
+            className={cn(
+              '@container/content bg-slate-50',
+              'has-data-[layout=fixed]:h-svh',
+              'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]'
+            )}
+          >
+            <TeacherNavbar />
+            <main className='min-w-0 flex-1 px-4 py-4 md:px-8 md:py-6 md:pb-6'>
+              <Outlet />
+            </main>
+          </SidebarInset>
+        </SidebarProvider>
+      </LayoutProvider>
+    </SearchProvider>
   )
 }

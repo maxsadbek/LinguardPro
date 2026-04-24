@@ -486,7 +486,9 @@ export default function TeachersPage() {
 
   // Student search state
   const [searchTerm, setSearchTerm] = useState('')
-  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(
+  const [searchTimeout, setSearchTimeout] = useState<ReturnType<
+    typeof setTimeout
+  > | null>(
     null
   )
 

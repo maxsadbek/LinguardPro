@@ -9,6 +9,7 @@ import {
   User,
   Menu,
 } from 'lucide-react'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 
 type SessionUser = {
   name?: string
@@ -81,10 +82,12 @@ export function TeacherNavbar({ onMenuClick }: TeacherNavbarProps) {
   return (
     <header className='sticky top-0 z-50 flex w-full items-center justify-between bg-white/70 px-4 py-3 backdrop-blur-md md:px-8 md:py-4'>
       <div className='flex items-center gap-4 md:gap-6'>
-        {onMenuClick && (
+        {onMenuClick ? (
           <button onClick={onMenuClick} className='md:hidden'>
             <Menu size={24} />
           </button>
+        ) : (
+          <SidebarTrigger className='md:hidden' />
         )}
         <Link to='/teacher-dashboard' className='leading-none'>
           <div className='text-lg font-black tracking-tight text-[#b80035]'>

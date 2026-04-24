@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 import {
   BadgeCheck,
   Bell,
@@ -37,6 +37,13 @@ type NavUserProps = {
 export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar()
   const [open, setOpen] = useDialogState()
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const isTeacherArea = pathname.startsWith('/teacher-dashboard')
+  const accountPath = isTeacherArea ? '/teacher-dashboard/profile' : '/settings/account'
+  const settingsPath = isTeacherArea ? '/teacher-dashboard/settings' : '/settings'
+  const notificationsPath = isTeacherArea
+    ? '/teacher-dashboard/notifications'
+    : '/settings/notifications'
 
   return (
     <>
@@ -87,19 +94,19 @@ export function NavUser({ user }: NavUserProps) {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                  <Link to='/settings/account'>
+                  <Link to={accountPath}>
                     <BadgeCheck />
                     Account
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to='/settings'>
+                  <Link to={settingsPath}>
                     <CreditCard />
                     Billing
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to='/settings/notifications'>
+                  <Link to={notificationsPath}>
                     <Bell />
                     Notifications
                   </Link>
