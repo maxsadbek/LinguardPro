@@ -9,7 +9,7 @@ async function importAuthStore() {
 const sampleUser = {
   accountNo: 'ACC-1',
   email: 'user@example.com',
-  role: 'user',
+  role: 'user' as const,
   exp: 1_700_000_000,
 } as const
 

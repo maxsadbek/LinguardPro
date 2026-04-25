@@ -1,21 +1,23 @@
 import {
   AudioWaveform,
-  Bell,
   Book,
+  BookOpen,
   GalleryVerticalEnd,
   GraduationCap,
   LayoutDashboard,
-  ListTodo,
-  Megaphone,
-  MessagesSquare,
+  ClipboardCheck,
+  MessageSquare,
+  ScrollText,
   Settings,
+  User,
 } from 'lucide-react'
 import { CustomLogo } from '@/assets/custom-logo'
 import { type SidebarData } from '../types'
 
 export const adminProfileStorageKey = 'linguapro_admin_profile'
+export type SidebarRole = 'admin' | 'teacher'
 
-export const sidebarData: SidebarData = {
+export const adminSidebarData: SidebarData = {
   user: {
     name: 'satnaing',
     email: 'satnaingdev@gmail.com',
@@ -44,51 +46,102 @@ export const sidebarData: SidebarData = {
       items: [
         {
           title: 'Dashboard',
-          url: '/',
+          url: '/admin-dashboard',
           icon: LayoutDashboard,
         },
         {
-          title: "O'quvchilar",
-          url: '/students',
-          icon: ListTodo,
+          title: 'Users',
+          url: '/users',
+          icon: User,
         },
         {
-          title: 'Ustozlar',
+          title: 'Teachers',
           url: '/teachers',
           icon: GraduationCap,
         },
         {
-          title: 'Kurslar',
+          title: 'Courses',
           url: '/courses',
           icon: Book,
         },
         {
-          title: 'Xabarlar',
-          url: '/chats',
-          badge: '3',
-          icon: MessagesSquare,
+          title: 'Reports',
+          url: '/notifications',
+          icon: ScrollText,
         },
       ],
     },
     {
-      title: 'Sozlamalar',
+      title: 'System',
       items: [
         {
-          title: 'Sozlamalar',
+          title: 'Settings',
           url: '/settings',
           icon: Settings,
-        },
-        {
-          title: "E'lonlar",
-          url: '/announcements',
-          icon: Megaphone,
-        },
-        {
-          title: 'Bildirishlar',
-          url: '/notifications',
-          icon: Bell,
         },
       ],
     },
   ],
+}
+
+export const sidebarData = adminSidebarData
+
+export const teacherSidebarData = {
+  user: {
+    name: 'Teacher',
+    email: '',
+    avatar: '/avatars/shadcn.jpg',
+  },
+  navItems: [
+    {
+      title: 'Dashboard',
+      url: '/teacher-dashboard',
+      icon: LayoutDashboard,
+    },
+    {
+      title: 'Groups',
+      url: '/teacher-dashboard/groups',
+      icon: BookOpen,
+    },
+    {
+      title: 'Attendance',
+      url: '/teacher-dashboard/attendance',
+      icon: ClipboardCheck,
+    },
+    {
+      title: 'Homework',
+      url: '/teacher-dashboard/homework',
+      icon: GraduationCap,
+    },
+    {
+      title: 'Messages',
+      url: '/teacher-dashboard/messages',
+      icon: MessageSquare,
+    },
+  ],
+  ctaLabel: 'New Class Session',
+} as const
+
+export const roleSidebarData: Record<SidebarRole, SidebarData> = {
+  admin: adminSidebarData,
+  teacher: {
+    user: teacherSidebarData.user,
+    teams: [
+      {
+        name: 'LinguaPro Teacher',
+        logo: CustomLogo,
+        plan: 'TEACHER PORTAL',
+      },
+    ],
+    navGroups: [
+      {
+        title: 'General',
+        items: teacherSidebarData.navItems.map((item) => ({
+          title: item.title,
+          url: item.url,
+          icon: item.icon,
+        })),
+      },
+    ],
+  },
 }
