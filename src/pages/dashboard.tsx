@@ -6,6 +6,7 @@ import {
   TrendingUp,
   TrendingDown,
 } from 'lucide-react'
+import { RoseButton } from '@/components/ui/rose-button'
 import { DashboardCard } from '@/components/dashboard-card'
 
 export default function Dashboard() {
@@ -59,9 +60,9 @@ export default function Dashboard() {
               <h2 className='text-lg font-bold text-slate-900'>
                 Recent Activity
               </h2>
-              <button className='text-sm font-semibold text-rose-600 hover:text-rose-700'>
+              <RoseButton roseVariant='link' roseSize='sm'>
                 View All
-              </button>
+              </RoseButton>
             </div>
             <div className='space-y-3'>
               <div className='flex items-center gap-4 rounded-xl bg-slate-50 p-4'>

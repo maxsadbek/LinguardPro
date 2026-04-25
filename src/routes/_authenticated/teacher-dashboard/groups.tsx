@@ -10,6 +10,7 @@ import {
   Calendar,
   UserCircle2,
 } from 'lucide-react'
+import { RoseButton } from '@/components/ui/rose-button'
 import { GroupModal } from '@/components/GroupModal'
 
 export const Route = createFileRoute(
@@ -123,20 +124,23 @@ function GroupsPage() {
   if (!selectedGroup) {
     return (
       <div>
-        <div className='mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+        <div className='mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center md:mb-8'>
           <div>
-            <h1 className='text-2xl md:text-3xl font-bold text-gray-800'>Groups</h1>
-            <p className='mt-1 md:mt-2 text-sm md:text-base text-gray-500'>
+            <h1 className='text-2xl font-bold text-gray-800 md:text-3xl'>
+              Groups
+            </h1>
+            <p className='mt-1 text-sm text-gray-500 md:mt-2 md:text-base'>
               Manage your student groups and classes
             </p>
           </div>
-          <button
+          <RoseButton
             onClick={() => setIsModalOpen(true)}
-            className='flex w-full sm:w-auto justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-[#b80035] to-[#e11d48] px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl'
+            className='flex w-full items-center justify-center rounded-xl px-6 py-3 sm:w-auto'
+            gradient
           >
             <Plus size={18} />
             Create New Group
-          </button>
+          </RoseButton>
         </div>
 
         {/* Search Bar */}
@@ -172,7 +176,7 @@ function GroupsPage() {
         />
 
         {/* Groups Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6'>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3'>
           {groups.map((group) => (
             <div
               key={group.id}
@@ -194,12 +198,13 @@ function GroupsPage() {
                 <Users size={16} />
                 <span>{group.students} students</span>
               </div>
-              <button
-                className='mt-4 w-full rounded-lg border border-[#b80035] py-2 text-sm font-semibold text-[#b80035] transition-colors hover:bg-[#fff0f3]'
+              <RoseButton
+                className='mt-4 w-full'
+                roseVariant='outline'
                 onClick={() => setSelectedGroup(group)}
               >
                 View Details
-              </button>
+              </RoseButton>
             </div>
           ))}
         </div>
@@ -220,27 +225,29 @@ function GroupsPage() {
       </div>
 
       {/* Header */}
-      <div className='mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center gap-4'>
-        <button
+      <div className='mb-6 flex flex-col items-start gap-4 sm:flex-row sm:items-center md:mb-8'>
+        <RoseButton
           onClick={() => setSelectedGroup(null)}
-          className='flex items-center gap-2 rounded-full bg-[#b80035] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#a00030] shrink-0'
+          className='shrink-0 rounded-full px-4 py-2'
         >
           <ArrowLeft size={16} />
           Back
-        </button>
+        </RoseButton>
         <div>
-          <h1 className='text-2xl md:text-3xl font-bold text-gray-800'>
+          <h1 className='text-2xl font-bold text-gray-800 md:text-3xl'>
             {selectedGroup.name}
           </h1>
-          <p className='mt-1 text-sm md:text-base text-gray-500'>Group students and statistics</p>
+          <p className='mt-1 text-sm text-gray-500 md:text-base'>
+            Group students and statistics
+          </p>
         </div>
       </div>
 
       {/* Students List Card */}
       <div className='mb-6 rounded-2xl bg-white p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)]'>
-        <div className='mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+        <div className='mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
           <h2 className='text-lg font-bold text-gray-800'>Students List</h2>
-          <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto'>
+          <div className='flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center'>
             <div className='relative w-full sm:w-auto'>
               <Search
                 className='absolute top-1/2 left-3 -translate-y-1/2 text-gray-400'
@@ -251,13 +258,13 @@ function GroupsPage() {
                 placeholder='Search...'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className='w-full sm:w-64 rounded-lg border border-gray-200 py-2 pr-3 pl-10 text-sm focus:border-[#b80035] focus:outline-none'
+                className='w-full rounded-lg border border-gray-200 py-2 pr-3 pl-10 text-sm focus:border-[#b80035] focus:outline-none sm:w-64'
               />
             </div>
-            <button className='flex items-center justify-center gap-2 rounded-lg bg-[#b80035] px-4 py-2 text-sm font-semibold text-white'>
+            <RoseButton className='rounded-lg px-4 py-2'>
               <Plus size={16} />
               Add Student
-            </button>
+            </RoseButton>
           </div>
         </div>
 
@@ -369,7 +376,7 @@ function GroupsPage() {
               <span className='text-lg leading-none'>×</span>
             </button>
           </div>
-          <div className='grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8'>
+          <div className='grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8'>
             <div className='text-center'>
               <p className='text-3xl font-bold text-blue-600'>85%</p>
               <p className='mt-1 text-sm text-gray-600'>Overall Activity</p>
@@ -387,7 +394,7 @@ function GroupsPage() {
       )}
 
       {/* Stats Cards */}
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6'>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6'>
         <div className='rounded-2xl bg-white p-6 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)]'>
           <div className='flex items-center justify-between'>
             <div>

@@ -7,6 +7,7 @@ import {
   Download,
   Plus,
 } from 'lucide-react'
+import { RoseButton } from '@/components/ui/rose-button'
 import { AddResultModal } from '@/components/teacher/modals/AddResultModal'
 
 export const Route = createFileRoute(
@@ -28,13 +29,13 @@ function ResultsPage() {
           </p>
         </div>
         <div className='flex items-center gap-3'>
-          <button
+          <RoseButton
             onClick={() => setOpen(true)}
-            className='flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#b80035] to-[#e11d48] px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl'
+            className='flex items-center gap-2'
           >
             <Plus size={18} />
             Add Result
-          </button>
+          </RoseButton>
           <button className='flex items-center gap-2 rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50'>
             <Download size={18} />
             Export Report

@@ -5,6 +5,7 @@ import { SearchProvider } from '@/context/search-provider'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { RoseButton } from '@/components/ui/rose-button'
 import {
   Card,
   CardContent,
@@ -328,8 +329,8 @@ export default function StudentsPage() {
               </div>
               <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                 <DialogTrigger asChild>
-                  <Button
-                    className='rounded-2xl bg-[#C00639] shadow-sm shadow-[#C00639] hover:bg-red-700 dark:border dark:border-[#A01521] dark:bg-transparent dark:text-white dark:hover:border-[#A01521]'
+                  <RoseButton
+                    className='rounded-2xl dark:border dark:border-[#A01521] dark:bg-transparent dark:text-white dark:hover:border-[#A01521]'
                     onClick={() => {
                       setFormData({
                         name: '',
@@ -345,7 +346,7 @@ export default function StudentsPage() {
                   >
                     <Plus className='mr-2 h-4 w-4' />
                     Add Student
-                  </Button>
+                  </RoseButton>
                 </DialogTrigger>
                 <DialogContent className='sm:max-w-125'>
                   <DialogHeader>
@@ -520,12 +521,12 @@ export default function StudentsPage() {
                       >
                         Bekor qilish
                       </Button>
-                      <Button
+                      <RoseButton
                         type='submit'
-                        className='bg-[#C00639] px-6 py-2 hover:bg-red-700'
+                        className='px-6 py-2'
                       >
                         Saqlash
-                      </Button>
+                      </RoseButton>
                     </div>
                   </form>
                 </DialogContent>

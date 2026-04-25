@@ -1,6 +1,7 @@
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { RoseButton } from '@/components/ui/rose-button'
 import type { Student } from '../index'
 
 interface DeleteModalProps {
@@ -40,12 +41,12 @@ export function DeleteModal({
             >
               BEKOR QILISH
             </Button>
-            <Button
+            <RoseButton
               onClick={onConfirm}
-              className='flex-1 bg-rose-600 text-white hover:bg-rose-700'
+              className='flex-1'
             >
               O'CHIRISH
-            </Button>
+            </RoseButton>
           </div>
         </div>
       </DialogContent>

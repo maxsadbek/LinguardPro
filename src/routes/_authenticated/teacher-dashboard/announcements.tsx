@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Megaphone, Plus, Calendar, Clock, Edit, Trash2 } from 'lucide-react'
+import { RoseButton } from '@/components/ui/rose-button'
 
 export const Route = createFileRoute('/_authenticated/teacher-dashboard/announcements')({
   component: AnnouncementsPage,
@@ -13,10 +14,10 @@ function AnnouncementsPage() {
           <h1 className='text-3xl font-bold text-gray-800'>Announcements</h1>
           <p className='mt-2 text-gray-500'>Create and manage announcements for your classes</p>
         </div>
-        <button className='flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#b80035] to-[#e11d48] px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl'>
+        <RoseButton className='rounded-xl px-6 py-3' gradient>
           <Plus size={18} />
           New Announcement
-        </button>
+        </RoseButton>
       </div>
 
       {/* Announcements List */}

@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import {
-  Calendar,
-  Clock,
-  Edit,
-  Megaphone,
-  Plus,
-  Trash2,
-} from 'lucide-react'
+import { Calendar, Clock, Edit, Megaphone, Plus, Trash2 } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,11 +11,11 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { RoseButton } from '@/components/ui/rose-button'
 import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
+import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { ConfigDrawer } from '@/components/config-drawer'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
@@ -178,13 +172,10 @@ export default function AnnouncementsPage() {
               Admin e'lonlarni kiritishi, tahrirlashi va o'chirishi mumkin.
             </p>
           </div>
-          <Button
-            onClick={handleOpenCreate}
-            className='gap-2 bg-rose-600 text-white hover:bg-rose-700'
-          >
+          <RoseButton onClick={handleOpenCreate} className='gap-2'>
             <Plus className='h-4 w-4' />
             Yangi e'lon
-          </Button>
+          </RoseButton>
         </div>
 
         <div className='mt-6 space-y-4'>
@@ -252,14 +243,14 @@ export default function AnnouncementsPage() {
                     >
                       <Edit className='h-4 w-4' />
                     </Button>
-                    <Button
-                      variant='outline'
-                      size='icon'
+                    <RoseButton
+                      roseVariant='ghost'
+                      roseSize='sm'
                       onClick={() => handleDelete(announcement.id)}
-                      className='h-9 w-9 text-rose-600 hover:text-rose-700'
+                      className='h-9 w-9'
                     >
                       <Trash2 className='h-4 w-4' />
-                    </Button>
+                    </RoseButton>
                   </div>
                 </div>
               </div>
@@ -268,7 +259,9 @@ export default function AnnouncementsPage() {
 
           {sortedAnnouncements.length === 0 && (
             <div className='rounded-2xl border bg-card p-10 text-center'>
-              <p className='text-sm text-muted-foreground'>Hozircha e'lon yo'q.</p>
+              <p className='text-sm text-muted-foreground'>
+                Hozircha e'lon yo'q.
+              </p>
             </div>
           )}
         </div>
@@ -288,7 +281,7 @@ export default function AnnouncementsPage() {
                   id='announcement-title'
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Masalan: Bugungi dars jadvali"
+                  placeholder='Masalan: Bugungi dars jadvali'
                 />
               </div>
 
@@ -306,30 +299,20 @@ export default function AnnouncementsPage() {
               <div className='space-y-2'>
                 <Label>Daraja</Label>
                 <div className='flex gap-2'>
-                  <Button
+                  <RoseButton
                     type='button'
-                    variant={priority === 'normal' ? 'default' : 'outline'}
+                    roseVariant={priority === 'normal' ? 'solid' : 'outline'}
                     onClick={() => setPriority('normal')}
-                    className={
-                      priority === 'normal'
-                        ? 'bg-rose-600 hover:bg-rose-700'
-                        : undefined
-                    }
                   >
                     Oddiy
-                  </Button>
-                  <Button
+                  </RoseButton>
+                  <RoseButton
                     type='button'
-                    variant={priority === 'high' ? 'default' : 'outline'}
+                    roseVariant={priority === 'high' ? 'solid' : 'outline'}
                     onClick={() => setPriority('high')}
-                    className={
-                      priority === 'high'
-                        ? 'bg-rose-600 hover:bg-rose-700'
-                        : undefined
-                    }
                   >
                     Muhim
-                  </Button>
+                  </RoseButton>
                 </div>
               </div>
             </div>
@@ -345,13 +328,9 @@ export default function AnnouncementsPage() {
               >
                 Bekor qilish
               </Button>
-              <Button
-                type='button'
-                onClick={handleSave}
-                className='bg-rose-600 text-white hover:bg-rose-700'
-              >
+              <RoseButton type='button' onClick={handleSave}>
                 Saqlash
-              </Button>
+              </RoseButton>
             </DialogFooter>
           </DialogContent>
         </Dialog>

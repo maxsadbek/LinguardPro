@@ -1,16 +1,54 @@
+import { useState, useEffect, useRef } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Mail, Phone, MapPin, Calendar, Edit, Save } from 'lucide-react'
+import { Mail, Phone, MapPin, Calendar, Save, Camera } from 'lucide-react'
+import { RoseButton } from '@/components/ui/rose-button'
 
-export const Route = createFileRoute('/_authenticated/teacher-dashboard/profile')({
+export const Route = createFileRoute(
+  '/_authenticated/teacher-dashboard/profile'
+)({
   component: ProfilePage,
 })
 
 function ProfilePage() {
+  const [photo, setPhoto] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const savedPhoto = localStorage.getItem('teacherProfilePhoto')
+    if (savedPhoto) {
+      setPhoto(savedPhoto)
+    }
+  }, [])
+
+  const handlePhotoClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setPhoto(base64String)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleSavePhoto = () => {
+    if (photo) {
+      localStorage.setItem('teacherProfilePhoto', photo)
+    }
+  }
+
   return (
     <div>
       <div className='mb-8'>
         <h1 className='text-3xl font-bold text-gray-800'>Profile</h1>
-        <p className='mt-2 text-gray-500'>Manage your account settings and information</p>
+        <p className='mt-2 text-gray-500'>
+          Manage your account settings and information
+        </p>
       </div>
 
       <div className='grid grid-cols-3 gap-6'>
@@ -18,10 +56,29 @@ function ProfilePage() {
         <div className='col-span-1'>
           <div className='rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'>
             <div className='flex flex-col items-center text-center'>
-              <div className='mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#b80035] to-[#e11d48] text-3xl font-bold text-white'>
-                E
+              <div className='relative mb-4'>
+                {photo ? (
+                  <img
+                    src={photo}
+                    alt='Profile'
+                    className='h-24 w-24 rounded-full object-cover'
+                  />
+                ) : (
+                  <div className='flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#b80035] to-[#e11d48] text-3xl font-bold text-white'>
+                    E
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type='file'
+                  accept='image/*'
+                  onChange={handlePhotoChange}
+                  className='hidden'
+                />
               </div>
-              <h2 className='text-xl font-bold text-gray-800'>Elena Rodriguez</h2>
+              <h2 className='text-xl font-bold text-gray-800'>
+                Elena Rodriguez
+              </h2>
               <p className='text-sm text-gray-500'>Spanish Teacher</p>
               <div className='mt-4 flex gap-2'>
                 <span className='rounded-full bg-[#fff0f3] px-3 py-1 text-xs font-semibold text-[#b80035]'>
@@ -31,8 +88,11 @@ function ProfilePage() {
                   Advanced
                 </span>
               </div>
-              <button className='mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50'>
-                <Edit size={16} />
+              <button
+                onClick={handlePhotoClick}
+                className='mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50'
+              >
+                <Camera size={16} />
                 Edit Photo
               </button>
             </div>
@@ -61,10 +121,14 @@ function ProfilePage() {
         {/* Settings Form */}
         <div className='col-span-2 space-y-6'>
           <div className='rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'>
-            <h3 className='mb-6 text-lg font-bold text-gray-800'>Personal Information</h3>
+            <h3 className='mb-6 text-lg font-bold text-gray-800'>
+              Personal Information
+            </h3>
             <div className='grid grid-cols-2 gap-4'>
               <div>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>First Name</label>
+                <label className='mb-2 block text-sm font-medium text-gray-700'>
+                  First Name
+                </label>
                 <input
                   type='text'
                   defaultValue='Elena'
@@ -72,7 +136,9 @@ function ProfilePage() {
                 />
               </div>
               <div>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>Last Name</label>
+                <label className='mb-2 block text-sm font-medium text-gray-700'>
+                  Last Name
+                </label>
                 <input
                   type='text'
                   defaultValue='Rodriguez'
@@ -80,7 +146,9 @@ function ProfilePage() {
                 />
               </div>
               <div>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>Email</label>
+                <label className='mb-2 block text-sm font-medium text-gray-700'>
+                  Email
+                </label>
                 <input
                   type='email'
                   defaultValue='elena@linguapro.com'
@@ -88,7 +156,9 @@ function ProfilePage() {
                 />
               </div>
               <div>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>Phone</label>
+                <label className='mb-2 block text-sm font-medium text-gray-700'>
+                  Phone
+                </label>
                 <input
                   type='tel'
                   defaultValue='+1 (555) 123-4567'
@@ -96,7 +166,9 @@ function ProfilePage() {
                 />
               </div>
               <div className='col-span-2'>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>Bio</label>
+                <label className='mb-2 block text-sm font-medium text-gray-700'>
+                  Bio
+                </label>
                 <textarea
                   defaultValue='Experienced Spanish teacher with 5+ years of teaching experience. Passionate about making language learning engaging and accessible for all students.'
                   rows={4}
@@ -105,20 +177,34 @@ function ProfilePage() {
               </div>
             </div>
             <div className='mt-6 flex justify-end'>
-              <button className='flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#b80035] to-[#e11d48] px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl'>
+              <RoseButton
+                className='flex items-center gap-2'
+                onClick={handleSavePhoto}
+              >
                 <Save size={18} />
                 Save Changes
-              </button>
+              </RoseButton>
             </div>
           </div>
 
           <div className='rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'>
-            <h3 className='mb-6 text-lg font-bold text-gray-800'>Notification Settings</h3>
+            <h3 className='mb-6 text-lg font-bold text-gray-800'>
+              Notification Settings
+            </h3>
             <div className='space-y-4'>
               {[
-                { label: 'Email notifications for new messages', checked: true },
-                { label: 'Email notifications for homework submissions', checked: true },
-                { label: 'Email notifications for announcements', checked: false },
+                {
+                  label: 'Email notifications for new messages',
+                  checked: true,
+                },
+                {
+                  label: 'Email notifications for homework submissions',
+                  checked: true,
+                },
+                {
+                  label: 'Email notifications for announcements',
+                  checked: false,
+                },
                 { label: 'Push notifications', checked: true },
               ].map((setting, index) => (
                 <div key={index} className='flex items-center justify-between'>

@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { RoseButton } from '@/components/ui/rose-button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Select,
@@ -339,10 +340,10 @@ export default function NotificationsPage() {
               onOpenChange={setIsCreateModalOpen}
             >
               <DialogTrigger asChild>
-                <Button className='flex items-center gap-2 bg-gradient-to-r from-[#b80035] to-[#e11d48] text-white'>
+                <RoseButton className='flex items-center gap-2'>
                   <Plus className='h-4 w-4' />
                   Yangi bildirishma
-                </Button>
+                </RoseButton>
               </DialogTrigger>
               <DialogContent className='sm:max-w-[560px]'>
                 <DialogHeader>
@@ -478,12 +479,9 @@ export default function NotificationsPage() {
                     >
                       Bekor qilish
                     </Button>
-                    <Button
-                      onClick={handleCreateNotification}
-                      className='bg-gradient-to-r from-[#b80035] to-[#e11d48] text-white'
-                    >
+                    <RoseButton onClick={handleCreateNotification}>
                       Yaratish
-                    </Button>
+                    </RoseButton>
                   </div>
                 </div>
               </DialogContent>
@@ -943,12 +941,9 @@ export default function NotificationsPage() {
                 >
                   Bekor qilish
                 </Button>
-                <Button
-                  onClick={handleUpdateNotification}
-                  className='bg-gradient-to-r from-[#b80035] to-[#e11d48] text-white'
-                >
+                <RoseButton onClick={handleUpdateNotification}>
                   Saqlash
-                </Button>
+                </RoseButton>
               </div>
             </div>
           </DialogContent>

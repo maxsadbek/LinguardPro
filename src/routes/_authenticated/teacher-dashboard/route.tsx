@@ -1,13 +1,31 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { getCookie } from '@/lib/cookies'
 import { cn } from '@/lib/utils'
 import { LayoutProvider } from '@/context/layout-provider'
 import { SearchProvider } from '@/context/search-provider'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import { TeacherNavbar } from '@/components/teacher/TeacherNavbar'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 
 export const Route = createFileRoute('/_authenticated/teacher-dashboard')({
+  beforeLoad: () => {
+    if (typeof window === 'undefined') return
+    const raw = sessionStorage.getItem('linguapro_user')
+    if (!raw) {
+      throw redirect({ to: '/sign-in' })
+    }
+    try {
+      const user = JSON.parse(raw) as { role?: string }
+      if (!user.role) {
+        throw redirect({ to: '/sign-in' })
+      }
+      if (user.role !== 'teacher') {
+        throw redirect({ to: '/admin-dashboard' })
+      }
+    } catch {
+      throw redirect({ to: '/sign-in' })
+    }
+  },
   component: TeacherDashboardLayout,
 })
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { BookOpen, Plus, Filter, Download } from 'lucide-react'
+import { RoseButton } from '@/components/ui/rose-button'
 import { AssignTaskModal } from '@/components/teacher/modals/AssignTaskModal'
 import { GroupDetailsModal } from '@/components/teacher/modals/GroupDetailsModal'
 
@@ -16,20 +17,22 @@ function HomeworkPage() {
 
   return (
     <div>
-      <div className='mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
+      <div className='mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center md:mb-8'>
         <div>
-          <h1 className='text-2xl md:text-3xl font-bold text-gray-800'>Homework</h1>
-          <p className='mt-1 md:mt-2 text-sm md:text-base text-gray-500'>
+          <h1 className='text-2xl font-bold text-gray-800 md:text-3xl'>
+            Homework
+          </h1>
+          <p className='mt-1 text-sm text-gray-500 md:mt-2 md:text-base'>
             Create and manage homework assignments
           </p>
         </div>
-        <button
+        <RoseButton
           onClick={() => setModalOpen(true)}
-          className='flex w-full sm:w-auto justify-center items-center gap-2 rounded-xl bg-gradient-to-r from-[#b80035] to-[#e11d48] px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl'
+          className='flex w-full items-center justify-center gap-2 sm:w-auto'
         >
           <Plus size={18} />
           Yangi vazifa
-        </button>
+        </RoseButton>
       </div>
 
       <AssignTaskModal open={modalOpen} onOpenChange={setModalOpen} />
@@ -53,14 +56,14 @@ function HomeworkPage() {
         <button className='rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100'>
           Tugatilgan
         </button>
-        <button className='w-full sm:w-auto mt-2 sm:mt-0 sm:ml-auto flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50'>
+        <button className='mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 sm:mt-0 sm:ml-auto sm:w-auto'>
           <Download size={16} />
           Eksport
         </button>
       </div>
 
       {/* Homework Cards */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6'>
+      <div className='grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-2'>
         {[
           {
             title: 'Unit 5 Quiz',
@@ -127,12 +130,13 @@ function HomeworkPage() {
                 style={{ width: `${(hw.submitted / hw.total) * 100}%` }}
               />
             </div>
-            <button
-              className='mt-4 w-full rounded-lg border border-[#b80035] py-2 text-sm font-semibold text-[#b80035] transition-colors hover:bg-[#fff0f3]'
+            <RoseButton
+              className='mt-4 w-full'
+              roseVariant='outline'
               onClick={() => setGroupDetailsOpen(true)}
             >
               Batafsil
-            </button>
+            </RoseButton>
           </div>
         ))}
       </div>

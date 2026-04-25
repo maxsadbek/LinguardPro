@@ -2,6 +2,7 @@ import type { Course } from '@/data/courses-data'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { RoseButton } from '@/components/ui/rose-button'
 
 interface CourseModalProps {
   isOpen: boolean
@@ -321,17 +322,15 @@ export function CourseModal({
             >
               Bekor qilish
             </Button>
-            <Button
+            <RoseButton
               type='submit'
               style={{
                 flex: 1,
-                background: '#e11d48',
-                color: '#fff',
                 border: 'none',
               }}
             >
               Qo'shish
-            </Button>
+            </RoseButton>
           </div>
         </form>
       </div>

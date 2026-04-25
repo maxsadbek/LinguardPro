@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { RoseButton } from '@/components/ui/rose-button'
 
 interface GroupModalProps {
   isOpen: boolean
@@ -222,17 +223,15 @@ export function GroupModal({
             >
               Bekor qilish
             </Button>
-            <Button
+            <RoseButton
               type='submit'
               style={{
                 flex: 1,
-                background: '#e11d48',
-                color: '#fff',
                 border: 'none',
               }}
             >
               Guruh qo&apos;shish
-            </Button>
+            </RoseButton>
           </div>
         </form>
       </div>
