@@ -273,7 +273,7 @@ function ProfilePage() {
                 />
               </FormField>
 
-              <FormField label='Last Name'>
+              <FormField label='Last Name (optional)'>
                 <input
                   type='text'
                   {...register('lastName')}

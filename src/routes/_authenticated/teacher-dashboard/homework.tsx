@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { BookOpen, Plus, Filter, Download } from 'lucide-react'
+import { BookOpen, Plus, Download } from 'lucide-react'
 import { RoseButton } from '@/components/ui/rose-button'
 import { AssignTaskModal } from '@/components/teacher/modals/AssignTaskModal'
 import { GroupDetailsModal } from '@/components/teacher/modals/GroupDetailsModal'
@@ -14,6 +14,7 @@ export const Route = createFileRoute(
 function HomeworkPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [groupDetailsOpen, setGroupDetailsOpen] = useState(false)
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all')
 
   return (
     <div>
@@ -43,17 +44,34 @@ function HomeworkPage() {
 
       {/* Filters */}
       <div className='mb-6 flex flex-wrap items-center gap-2 md:gap-4'>
-        <button className='flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50'>
-          <Filter size={16} />
-          Filter
-        </button>
-        <button className='rounded-lg bg-[#fff0f3] px-4 py-2 text-sm font-semibold text-[#b80035]'>
+        <button
+          onClick={() => setFilter('all')}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+            filter === 'all'
+              ? 'bg-[#fff0f3] text-[#b80035]'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
           Barchasi
         </button>
-        <button className='rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100'>
+        <button
+          onClick={() => setFilter('active')}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+            filter === 'active'
+              ? 'bg-[#fff0f3] text-[#b80035]'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
           Faol
         </button>
-        <button className='rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100'>
+        <button
+          onClick={() => setFilter('completed')}
+          className={`rounded-lg px-4 py-2 text-sm font-semibold ${
+            filter === 'completed'
+              ? 'bg-[#fff0f3] text-[#b80035]'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
           Tugatilgan
         </button>
         <button className='mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 sm:mt-0 sm:ml-auto sm:w-auto'>
@@ -97,48 +115,54 @@ function HomeworkPage() {
             total: 20,
             status: 'active',
           },
-        ].map((hw, index) => (
-          <div
-            key={index}
-            className='rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'
-          >
-            <div className='mb-4 flex items-start justify-between'>
-              <div className='rounded-xl bg-[#fff0f3] p-3 text-[#b80035]'>
-                <BookOpen size={24} />
-              </div>
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  hw.status === 'active'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-700'
-                }`}
-              >
-                {hw.status === 'active' ? 'Faol' : 'Tugatilgan'}
-              </span>
-            </div>
-            <h3 className='text-lg font-bold text-gray-800'>{hw.title}</h3>
-            <p className='text-sm text-gray-500'>{hw.group}</p>
-            <div className='mt-4 flex items-center justify-between text-sm text-gray-600'>
-              <span>Muddat: {hw.due}</span>
-              <span>
-                {hw.submitted}/{hw.total} topshirildi
-              </span>
-            </div>
-            <div className='mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-200'>
-              <div
-                className='h-full bg-[#b80035]'
-                style={{ width: `${(hw.submitted / hw.total) * 100}%` }}
-              />
-            </div>
-            <RoseButton
-              className='mt-4 w-full'
-              roseVariant='outline'
-              onClick={() => setGroupDetailsOpen(true)}
+        ]
+          .filter((hw) => {
+            if (filter === 'active') return hw.status === 'active'
+            if (filter === 'completed') return hw.status === 'completed'
+            return true
+          })
+          .map((hw, index) => (
+            <div
+              key={index}
+              className='rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'
             >
-              Batafsil
-            </RoseButton>
-          </div>
-        ))}
+              <div className='mb-4 flex items-start justify-between'>
+                <div className='rounded-xl bg-[#fff0f3] p-3 text-[#b80035]'>
+                  <BookOpen size={24} />
+                </div>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    hw.status === 'active'
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {hw.status === 'active' ? 'Faol' : 'Tugatilgan'}
+                </span>
+              </div>
+              <h3 className='text-lg font-bold text-gray-800'>{hw.title}</h3>
+              <p className='text-sm text-gray-500'>{hw.group}</p>
+              <div className='mt-4 flex items-center justify-between text-sm text-gray-600'>
+                <span>Muddat: {hw.due}</span>
+                <span>
+                  {hw.submitted}/{hw.total} topshirildi
+                </span>
+              </div>
+              <div className='mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-200'>
+                <div
+                  className='h-full bg-[#b80035]'
+                  style={{ width: `${(hw.submitted / hw.total) * 100}%` }}
+                />
+              </div>
+              <RoseButton
+                className='mt-4 w-full'
+                roseVariant='outline'
+                onClick={() => setGroupDetailsOpen(true)}
+              >
+                Batafsil
+              </RoseButton>
+            </div>
+          ))}
       </div>
     </div>
   )

@@ -185,8 +185,8 @@ export function TeacherNavbar({ onMenuClick }: TeacherNavbarProps) {
             )}
             <div className='hidden min-w-0 text-left md:block'>
               <p className='truncate text-sm leading-4 font-bold text-slate-900'>
-                {profileData?.firstName && profileData?.lastName
-                  ? `${profileData.firstName} ${profileData.lastName}`
+                {profileData?.firstName
+                  ? `${profileData.firstName}${profileData.lastName ? ` ${profileData.lastName}` : ''}`
                   : (sessionUser?.name ?? 'Teacher')}
               </p>
               <p className='truncate text-xs text-slate-500'>
