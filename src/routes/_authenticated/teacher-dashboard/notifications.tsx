@@ -10,12 +10,14 @@ export const Route = createFileRoute(
 function NotificationsPage() {
   return (
     <div>
-      <div className='mb-8'>
+      <div className='mb-8 px-4 py-6 md:px-6 md:py-8'>
         <h1 className='text-3xl font-bold text-gray-800'>Notifications</h1>
-        <p className='mt-2 text-gray-500'>Updates and reminders for your classes</p>
+        <p className='mt-2 text-gray-500'>
+          Updates and reminders for your classes
+        </p>
       </div>
 
-      <div className='space-y-4'>
+      <div className='space-y-4 px-4 py-4 md:px-6 md:py-6'>
         {[
           {
             title: 'Homework deadline tomorrow',
@@ -29,16 +31,16 @@ function NotificationsPage() {
           },
           {
             title: 'Attendance reminder',
-            body: 'Don\'t forget to mark attendance for today\'s lesson.',
+            body: "Don't forget to mark attendance for today's lesson.",
             time: '3h ago',
           },
         ].map((n, idx) => (
           <div
             key={idx}
-            className='flex items-start justify-between gap-4 rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'
+            className='flex items-start justify-between gap-4 rounded-2xl bg-white p-8 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'
           >
             <div className='flex items-start gap-4'>
-              <div className='rounded-xl bg-[#fff0f3] p-3 text-[#b80035]'>
+              <div className='rounded-xl bg-[#fff0f3] p-4 text-[#b80035]'>
                 <Bell size={22} />
               </div>
               <div>
@@ -48,7 +50,7 @@ function NotificationsPage() {
               </div>
             </div>
 
-            <button className='inline-flex items-center gap-2 rounded-xl bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100'>
+            <button className='inline-flex items-center gap-2 rounded-xl bg-gray-50 px-6 py-3 text-sm font-semibold text-gray-600 hover:bg-gray-100'>
               <CheckCircle2 size={16} />
               Mark read
             </button>

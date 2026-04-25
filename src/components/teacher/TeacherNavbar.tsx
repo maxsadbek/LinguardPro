@@ -41,9 +41,45 @@ export function TeacherNavbar({ onMenuClick }: TeacherNavbarProps) {
       return null
     }
   })
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null)
+  const [profileData, setProfileData] = useState<{
+    firstName?: string
+    lastName?: string
+    email?: string
+  } | null>(null)
   const [open, setOpen] = useState(false)
   const navigate = useNavigate()
   const menuRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    const loadProfileData = () => {
+      const savedPhoto = localStorage.getItem('teacherProfilePhoto')
+      if (savedPhoto) {
+        setProfilePhoto(savedPhoto)
+      }
+
+      const savedProfile = localStorage.getItem('teacherProfileData')
+      if (savedProfile) {
+        try {
+          const data = JSON.parse(savedProfile)
+          console.log('Navbar loaded profile data:', data)
+          setProfileData(data)
+        } catch {
+          // Ignore parse errors
+        }
+      }
+    }
+
+    loadProfileData()
+
+    const handleProfileDataUpdated = () => {
+      loadProfileData()
+    }
+
+    window.addEventListener('profileDataUpdated', handleProfileDataUpdated)
+    return () =>
+      window.removeEventListener('profileDataUpdated', handleProfileDataUpdated)
+  }, [])
 
   const initials = useMemo(
     () => getInitials(sessionUser?.name),
@@ -136,15 +172,25 @@ export function TeacherNavbar({ onMenuClick }: TeacherNavbarProps) {
             aria-haspopup='menu'
             aria-expanded={open}
           >
-            <div className='flex h-8 w-8 items-center justify-center rounded-full bg-rose-100 text-xs font-extrabold text-rose-700 md:h-10 md:w-10 md:text-sm'>
-              {initials}
-            </div>
+            {profilePhoto ? (
+              <img
+                src={profilePhoto}
+                alt='Profile'
+                className='h-8 w-8 rounded-full object-cover md:h-10 md:w-10'
+              />
+            ) : (
+              <div className='flex h-8 w-8 items-center justify-center rounded-full bg-rose-100 text-xs font-extrabold text-rose-700 md:h-10 md:w-10 md:text-sm'>
+                {initials}
+              </div>
+            )}
             <div className='hidden min-w-0 text-left md:block'>
               <p className='truncate text-sm leading-4 font-bold text-slate-900'>
-                {sessionUser?.name ?? 'Teacher'}
+                {profileData?.firstName && profileData?.lastName
+                  ? `${profileData.firstName} ${profileData.lastName}`
+                  : (sessionUser?.name ?? 'Teacher')}
               </p>
               <p className='truncate text-xs text-slate-500'>
-                {sessionUser?.email ?? ''}
+                {profileData?.email ?? sessionUser?.email ?? ''}
               </p>
             </div>
             <ChevronDown

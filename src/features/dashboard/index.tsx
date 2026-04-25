@@ -1,14 +1,14 @@
-import { ClipboardCheck, DollarSign, Network, Users } from 'lucide-react';
-import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { ConfigDrawer } from '@/components/config-drawer';
-import { DashboardCard } from '@/components/dashboard-card';
-import { Header } from '@/components/layout/header';
-import { Main } from '@/components/layout/main';
-import { ProfileDropdown } from '@/components/profile-dropdown';
-import { Search } from '@/components/search';
-import { ThemeSwitch } from '@/components/theme-switch';
-import { GroupCapacity } from './components/group-capacity';
-import { StudentGrowth } from './components/student-growth';
+import { ClipboardCheck, DollarSign, Network, Users } from 'lucide-react'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
+import { ConfigDrawer } from '@/components/config-drawer'
+import { DashboardCard } from '@/components/dashboard-card'
+import { Header } from '@/components/layout/header'
+import { Main } from '@/components/layout/main'
+import { ProfileDropdown } from '@/components/profile-dropdown'
+import { Search } from '@/components/search'
+import { ThemeSwitch } from '@/components/theme-switch'
+import { GroupCapacity } from './components/group-capacity'
+import { StudentGrowth } from './components/student-growth'
 
 export default function Dashboard() {
   return (

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useForm } from 'react-hook-form'
 import { createFileRoute } from '@tanstack/react-router'
 import { Mail, Phone, MapPin, Calendar, Save, Camera } from 'lucide-react'
 import { RoseButton } from '@/components/ui/rose-button'
@@ -9,65 +10,218 @@ export const Route = createFileRoute(
   component: ProfilePage,
 })
 
+type ProfileForm = {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  bio: string
+}
+
+type DisplayData = Pick<
+  ProfileForm,
+  'firstName' | 'lastName' | 'email' | 'phone'
+>
+
+const DEFAULT_PROFILE: ProfileForm = {
+  firstName: 'Elena',
+  lastName: 'Rodriguez',
+  email: 'elena@linguapro.com',
+  phone: '+998 90 123 45 67',
+  bio: 'Experienced Spanish teacher with 5+ years of teaching experience.',
+}
+
+const NOTIFICATION_SETTINGS = [
+  { label: 'Email notifications for new messages', checked: true },
+  { label: 'Email notifications for homework submissions', checked: true },
+  { label: 'Email notifications for announcements', checked: false },
+  { label: 'Push notifications', checked: true },
+]
+
+const PHONE_REGEX = /^\+998\s?\d{2}\s?\d{3}\s?\d{2}\s?\d{2}$/
+
+const formatPhone = (value: string) => {
+  if (!value) return ''
+
+  // Faqat raqamlarni oladi va maksimal 12 ta raqam qoldiradi (+998 va qolgan 9 ta raqam)
+  const digits = value.replace(/\D/g, '').slice(0, 12)
+  if (!digits) return ''
+
+  if (digits.length <= 3) return `+${digits}`
+  if (digits.length <= 5) return `+${digits.slice(0, 3)} ${digits.slice(3)}`
+  if (digits.length <= 8)
+    return `+${digits.slice(0, 3)} ${digits.slice(3, 5)} ${digits.slice(5)}`
+  if (digits.length <= 10)
+    return `+${digits.slice(0, 3)} ${digits.slice(3, 5)} ${digits.slice(5, 8)} ${digits.slice(8)}`
+
+  return `+${digits.slice(0, 3)} ${digits.slice(3, 5)} ${digits.slice(5, 8)} ${digits.slice(8, 10)} ${digits.slice(10, 12)}`
+}
+
+const inputClassName =
+  'w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-900 outline-none transition focus:border-rose-300 focus:ring-2 focus:ring-rose-600/15'
+
+function InfoRow({
+  icon: Icon,
+  value,
+}: {
+  icon: React.ElementType
+  value: string
+}) {
+  return (
+    <div className='flex items-center gap-3 text-sm text-gray-600'>
+      <Icon size={16} className='shrink-0 text-gray-400' />
+      <span className='truncate'>{value}</span>
+    </div>
+  )
+}
+
+function ToggleSwitch({ checked }: { checked: boolean }) {
+  return (
+    <button
+      type='button'
+      className={`relative h-6 w-11 rounded-full transition-colors ${checked ? 'bg-[#b80035]' : 'bg-gray-200'}`}
+    >
+      <div
+        className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`}
+      />
+    </button>
+  )
+}
+
+function FormField({
+  label,
+  error,
+  children,
+  className,
+}: {
+  label: string
+  error?: string
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <div className={className}>
+      <label className='mb-1.5 block text-sm font-medium text-gray-700'>
+        {label}
+      </label>
+      {children}
+      {error && <p className='mt-1 text-xs text-red-500'>{error}</p>}
+    </div>
+  )
+}
+
 function ProfilePage() {
   const [photo, setPhoto] = useState<string | null>(null)
+  const [displayData, setDisplayData] = useState<DisplayData>({
+    firstName: DEFAULT_PROFILE.firstName,
+    lastName: DEFAULT_PROFILE.lastName,
+    email: DEFAULT_PROFILE.email,
+    phone: DEFAULT_PROFILE.phone,
+  })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    const savedPhoto = localStorage.getItem('teacherProfilePhoto')
-    if (savedPhoto) {
-      setPhoto(savedPhoto)
-    }
-  }, [])
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<ProfileForm>({
+    defaultValues: DEFAULT_PROFILE,
+    mode: 'onBlur',
+  })
 
-  const handlePhotoClick = () => {
-    fileInputRef.current?.click()
-  }
+  const {
+    ref: phoneRef,
+    onChange: phoneOnChange,
+    ...phoneRest
+  } = register('phone', {
+    pattern: {
+      value: PHONE_REGEX,
+      message: "To'g'ri format: +998 XX XXX XX XX",
+    },
+  })
+
+  useEffect(() => {
+    const loadFromLocalStorage = () => {
+      const savedPhoto = localStorage.getItem('teacherProfilePhoto')
+      if (savedPhoto) setPhoto(savedPhoto)
+
+      const savedProfile = localStorage.getItem('teacherProfileData')
+      if (!savedProfile) return
+
+      try {
+        const data: Partial<ProfileForm> = JSON.parse(savedProfile)
+        const merged = { ...DEFAULT_PROFILE, ...data }
+        Object.entries(merged).forEach(([key, val]) =>
+          setValue(key as keyof ProfileForm, val)
+        )
+        setDisplayData({
+          firstName: merged.firstName,
+          lastName: merged.lastName,
+          email: merged.email,
+          phone: merged.phone,
+        })
+      } catch {}
+    }
+
+    loadFromLocalStorage()
+    window.addEventListener('profileDataUpdated', loadFromLocalStorage)
+    return () =>
+      window.removeEventListener('profileDataUpdated', loadFromLocalStorage)
+  }, [setValue])
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const base64String = reader.result as string
-        setPhoto(base64String)
-      }
-      reader.readAsDataURL(file)
-    }
+    if (!file) return
+    const reader = new FileReader()
+    reader.onloadend = () => setPhoto(reader.result as string)
+    reader.readAsDataURL(file)
   }
 
-  const handleSavePhoto = () => {
-    if (photo) {
-      localStorage.setItem('teacherProfilePhoto', photo)
-    }
+  const onSubmit = (data: ProfileForm) => {
+    if (photo) localStorage.setItem('teacherProfilePhoto', photo)
+    localStorage.setItem('teacherProfileData', JSON.stringify(data))
+    setDisplayData({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+    })
+    window.dispatchEvent(new Event('profileDataUpdated'))
   }
 
   return (
     <div>
       <div className='mb-8'>
-        <h1 className='text-3xl font-bold text-gray-800'>Profile</h1>
-        <p className='mt-2 text-gray-500'>
+        <h1 className='text-2xl font-bold text-gray-900'>Profile</h1>
+        <p className='mt-1 text-sm text-gray-500'>
           Manage your account settings and information
         </p>
       </div>
 
       <div className='grid grid-cols-3 gap-6'>
-        {/* Profile Card */}
         <div className='col-span-1'>
-          <div className='rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'>
+          <div className='rounded-2xl bg-white p-6 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)]'>
             <div className='flex flex-col items-center text-center'>
               <div className='relative mb-4'>
                 {photo ? (
                   <img
                     src={photo}
                     alt='Profile'
-                    className='h-24 w-24 rounded-full object-cover'
+                    className='h-24 w-24 rounded-full object-cover ring-4 ring-rose-50'
                   />
                 ) : (
-                  <div className='flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#b80035] to-[#e11d48] text-3xl font-bold text-white'>
-                    E
+                  <div className='flex h-24 w-24 items-center justify-center rounded-full bg-[#b80035] text-3xl font-bold text-white ring-4 ring-rose-50'>
+                    {displayData.firstName[0]}
                   </div>
                 )}
+                <button
+                  type='button'
+                  onClick={() => fileInputRef.current?.click()}
+                  className='absolute -right-1 -bottom-1 grid h-8 w-8 place-items-center rounded-full bg-white shadow-md ring-1 ring-gray-100 hover:bg-gray-50'
+                >
+                  <Camera size={14} className='text-gray-600' />
+                </button>
                 <input
                   ref={fileInputRef}
                   type='file'
@@ -76,150 +230,110 @@ function ProfilePage() {
                   className='hidden'
                 />
               </div>
-              <h2 className='text-xl font-bold text-gray-800'>
-                Elena Rodriguez
+
+              <h2 className='text-lg font-bold text-gray-900'>
+                {displayData.firstName} {displayData.lastName}
               </h2>
               <p className='text-sm text-gray-500'>Spanish Teacher</p>
-              <div className='mt-4 flex gap-2'>
-                <span className='rounded-full bg-[#fff0f3] px-3 py-1 text-xs font-semibold text-[#b80035]'>
+
+              <div className='mt-3 flex gap-2'>
+                <span className='rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-[#b80035]'>
                   Intermediate
                 </span>
-                <span className='rounded-full bg-[#fff0f3] px-3 py-1 text-xs font-semibold text-[#b80035]'>
+                <span className='rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-[#b80035]'>
                   Advanced
                 </span>
               </div>
-              <button
-                onClick={handlePhotoClick}
-                className='mt-6 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50'
-              >
-                <Camera size={16} />
-                Edit Photo
-              </button>
             </div>
 
-            <div className='mt-6 space-y-4 border-t border-gray-200 pt-6'>
-              <div className='flex items-center gap-3 text-sm text-gray-600'>
-                <Mail size={18} className='text-gray-400' />
-                <span>elena@linguapro.com</span>
-              </div>
-              <div className='flex items-center gap-3 text-sm text-gray-600'>
-                <Phone size={18} className='text-gray-400' />
-                <span>+1 (555) 123-4567</span>
-              </div>
-              <div className='flex items-center gap-3 text-sm text-gray-600'>
-                <MapPin size={18} className='text-gray-400' />
-                <span>New York, USA</span>
-              </div>
-              <div className='flex items-center gap-3 text-sm text-gray-600'>
-                <Calendar size={18} className='text-gray-400' />
-                <span>Joined March 2024</span>
-              </div>
+            <div className='mt-6 space-y-3 border-t border-gray-100 pt-6'>
+              <InfoRow icon={Mail} value={displayData.email} />
+              <InfoRow icon={Phone} value={displayData.phone} />
+              <InfoRow icon={MapPin} value='Uzbekistan, Karshi' />
+              <InfoRow icon={Calendar} value='Joined March 2024' />
             </div>
           </div>
         </div>
 
-        {/* Settings Form */}
         <div className='col-span-2 space-y-6'>
-          <div className='rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'>
-            <h3 className='mb-6 text-lg font-bold text-gray-800'>
+          <div className='rounded-2xl bg-white p-6 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)]'>
+            <h3 className='mb-5 text-base font-bold text-gray-900'>
               Personal Information
             </h3>
-            <div className='grid grid-cols-2 gap-4'>
-              <div>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>
-                  First Name
-                </label>
+            <form
+              id='profile-form'
+              onSubmit={handleSubmit(onSubmit)}
+              className='grid grid-cols-2 gap-4'
+            >
+              <FormField label='First Name'>
                 <input
                   type='text'
-                  defaultValue='Elena'
-                  className='w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:ring-2 focus:ring-[#b80035]/20 focus:outline-none'
+                  {...register('firstName')}
+                  className={inputClassName}
                 />
-              </div>
-              <div>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>
-                  Last Name
-                </label>
+              </FormField>
+
+              <FormField label='Last Name'>
                 <input
                   type='text'
-                  defaultValue='Rodriguez'
-                  className='w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:ring-2 focus:ring-[#b80035]/20 focus:outline-none'
+                  {...register('lastName')}
+                  className={inputClassName}
                 />
-              </div>
-              <div>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>
-                  Email
-                </label>
+              </FormField>
+
+              <FormField label='Email'>
                 <input
                   type='email'
-                  defaultValue='elena@linguapro.com'
-                  className='w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:ring-2 focus:ring-[#b80035]/20 focus:outline-none'
+                  {...register('email')}
+                  className={inputClassName}
                 />
-              </div>
-              <div>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>
-                  Phone
-                </label>
+              </FormField>
+
+              <FormField label='Phone' error={errors.phone?.message}>
                 <input
                   type='tel'
-                  defaultValue='+1 (555) 123-4567'
-                  className='w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:ring-2 focus:ring-[#b80035]/20 focus:outline-none'
+                  placeholder='+998 90 123 45 67'
+                  {...phoneRest}
+                  ref={phoneRef}
+                  onChange={(e) => {
+                    const formatted = formatPhone(e.target.value)
+                    e.target.value = formatted
+                    phoneOnChange(e)
+                  }}
+                  maxLength={17}
+                  className={inputClassName}
                 />
-              </div>
-              <div className='col-span-2'>
-                <label className='mb-2 block text-sm font-medium text-gray-700'>
-                  Bio
-                </label>
+              </FormField>
+
+              <FormField label='Bio' className='col-span-2'>
                 <textarea
-                  defaultValue='Experienced Spanish teacher with 5+ years of teaching experience. Passionate about making language learning engaging and accessible for all students.'
-                  rows={4}
-                  className='w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:ring-2 focus:ring-[#b80035]/20 focus:outline-none'
+                  {...register('bio')}
+                  rows={3}
+                  className={`${inputClassName} resize-none`}
                 />
-              </div>
-            </div>
-            <div className='mt-6 flex justify-end'>
-              <RoseButton
-                className='flex items-center gap-2'
-                onClick={handleSavePhoto}
-              >
-                <Save size={18} />
+              </FormField>
+            </form>
+
+            <div className='mt-5 flex justify-end'>
+              <RoseButton type='submit' form='profile-form'>
+                <Save size={16} />
                 Save Changes
               </RoseButton>
             </div>
           </div>
 
-          <div className='rounded-2xl bg-white p-6 shadow-[0_20px_40px_-10px_rgba(25,28,30,0.06)]'>
-            <h3 className='mb-6 text-lg font-bold text-gray-800'>
+          <div className='rounded-2xl bg-white p-6 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.08)]'>
+            <h3 className='mb-5 text-base font-bold text-gray-900'>
               Notification Settings
             </h3>
             <div className='space-y-4'>
-              {[
-                {
-                  label: 'Email notifications for new messages',
-                  checked: true,
-                },
-                {
-                  label: 'Email notifications for homework submissions',
-                  checked: true,
-                },
-                {
-                  label: 'Email notifications for announcements',
-                  checked: false,
-                },
-                { label: 'Push notifications', checked: true },
-              ].map((setting, index) => (
-                <div key={index} className='flex items-center justify-between'>
+              {NOTIFICATION_SETTINGS.map((setting) => (
+                <div
+                  key={setting.label}
+                  className='flex items-center justify-between'
+                >
                   <span className='text-sm text-gray-700'>{setting.label}</span>
-                  <button
-                    className={`h-6 w-11 rounded-full transition-colors ${
-                      setting.checked ? 'bg-[#b80035]' : 'bg-gray-300'
-                    }`}
-                  >
-                    <div
-                      className={`h-5 w-5 rounded-full bg-white transition-transform ${
-                        setting.checked ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
+                  <ToggleSwitch checked={setting.checked} />
                 </div>
               ))}
             </div>
