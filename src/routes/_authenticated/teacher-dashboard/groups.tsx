@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Calendar,
   UserCircle2,
+  X,
 } from 'lucide-react'
 import { RoseButton } from '@/components/ui/rose-button'
 import { GroupModal } from '@/components/GroupModal'
@@ -102,10 +103,12 @@ const students: Student[] = [
 
 function GroupsPage() {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null)
-  const [studentList] = useState<Student[]>(students)
+  const [studentList, setStudentList] = useState<Student[]>(students)
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false)
+  const [newStudent, setNewStudent] = useState({ name: '', phone: '' })
   const [newGroup, setNewGroup] = useState({
     name: '',
     description: '',
@@ -136,7 +139,7 @@ function GroupsPage() {
           <RoseButton
             onClick={() => setIsModalOpen(true)}
             className='flex w-full items-center justify-center rounded-xl px-6 py-3 sm:w-auto'
-            gradient
+            roseVariant='gradient'
           >
             <Plus size={18} />
             Create New Group
@@ -261,7 +264,10 @@ function GroupsPage() {
                 className='w-full rounded-lg border border-gray-200 py-2 pr-3 pl-10 text-sm focus:border-[#b80035] focus:outline-none sm:w-64'
               />
             </div>
-            <RoseButton className='rounded-lg px-4 py-2'>
+            <RoseButton
+              onClick={() => setIsAddStudentModalOpen(true)}
+              className='rounded-lg px-4 py-2'
+            >
               <Plus size={16} />
               Add Student
             </RoseButton>
@@ -347,10 +353,22 @@ function GroupsPage() {
                   </td>
                   <td className='px-4 py-3'>
                     <div className='flex items-center gap-2'>
-                      <button className='rounded-lg border border-gray-200 p-1.5 text-gray-600 hover:border-blue-500 hover:text-blue-500'>
+                      <button
+                        onClick={() => setSelectedStudent(student)}
+                        className='rounded-lg border border-gray-200 p-1.5 text-gray-600 hover:border-blue-500 hover:text-blue-500'
+                      >
                         <MoreVertical size={16} />
                       </button>
-                      <button className='rounded-lg border border-gray-200 p-1.5 text-gray-600 hover:border-red-500 hover:text-red-500'>
+                      <button
+                        onClick={() => {
+                          // Handle delete functionality
+                          const updatedStudents = studentList.filter(
+                            (s) => s.id !== student.id
+                          )
+                          setStudentList(updatedStudents)
+                        }}
+                        className='rounded-lg border border-gray-200 p-1.5 text-gray-600 hover:border-red-500 hover:text-red-500'
+                      >
                         <span className='text-sm font-bold'>×</span>
                       </button>
                     </div>
@@ -371,9 +389,9 @@ function GroupsPage() {
             </h3>
             <button
               onClick={() => setSelectedStudent(null)}
-              className='rounded-full p-1 text-gray-400 hover:bg-blue-100 hover:text-gray-600'
+              className='grid h-8 w-8 place-items-center rounded-full bg-white text-gray-500 hover:bg-gray-100'
             >
-              <span className='text-lg leading-none'>×</span>
+              <X size={16} />
             </button>
           </div>
           <div className='grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-8'>
@@ -429,6 +447,84 @@ function GroupsPage() {
           </div>
         </div>
       </div>
+
+      {/* Add Student Modal */}
+      {isAddStudentModalOpen && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div className='w-full max-w-md rounded-2xl bg-white p-6 shadow-xl'>
+            <div className='mb-4 flex items-center justify-between'>
+              <h3 className='text-xl font-bold text-gray-900'>Add Student</h3>
+              <button
+                onClick={() => setIsAddStudentModalOpen(false)}
+                className='grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200'
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                const newStudentData: Student = {
+                  id: String(studentList.length + 1),
+                  name: newStudent.name,
+                  phone: newStudent.phone,
+                  attendance: 'present',
+                }
+                setStudentList([...studentList, newStudentData])
+                setNewStudent({ name: '', phone: '' })
+                setIsAddStudentModalOpen(false)
+              }}
+              className='space-y-4'
+            >
+              <div>
+                <label className='mb-2 block text-sm font-medium text-gray-700'>
+                  Student Name
+                </label>
+                <input
+                  type='text'
+                  value={newStudent.name}
+                  onChange={(e) =>
+                    setNewStudent({ ...newStudent, name: e.target.value })
+                  }
+                  className='w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:border-[#b80035] focus:outline-none'
+                  placeholder='Enter student name'
+                  required
+                />
+              </div>
+              <div>
+                <label className='mb-2 block text-sm font-medium text-gray-700'>
+                  Phone Number
+                </label>
+                <input
+                  type='text'
+                  value={newStudent.phone}
+                  onChange={(e) =>
+                    setNewStudent({ ...newStudent, phone: e.target.value })
+                  }
+                  className='w-full rounded-lg border border-gray-200 px-4 py-2 text-sm focus:border-[#b80035] focus:outline-none'
+                  placeholder='+998 XX XXX XX XX'
+                  required
+                />
+              </div>
+              <div className='flex justify-end gap-3 pt-4'>
+                <button
+                  type='button'
+                  onClick={() => setIsAddStudentModalOpen(false)}
+                  className='rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50'
+                >
+                  Cancel
+                </button>
+                <button
+                  type='submit'
+                  className='rounded-lg bg-[#b80035] px-4 py-2 text-sm font-medium text-white hover:bg-[#a0002d]'
+                >
+                  Add Student
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

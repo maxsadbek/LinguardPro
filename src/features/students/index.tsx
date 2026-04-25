@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { studentsData } from '@/data/students-data'
 import { Edit, Eye, Plus, Search, Trash2, User, X } from 'lucide-react'
 import { SearchProvider } from '@/context/search-provider'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { RoseButton } from '@/components/ui/rose-button'
 import {
   Card,
   CardContent,
@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { RoseButton } from '@/components/ui/rose-button'
 import {
   Select,
   SelectContent,
@@ -45,7 +46,6 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { StudentModal } from './components/StudentModal'
-import { Link } from '@tanstack/react-router'
 
 export interface Student {
   id: number
@@ -348,12 +348,19 @@ export default function StudentsPage() {
                     Add Student
                   </RoseButton>
                 </DialogTrigger>
-                <DialogContent className='sm:max-w-125'>
-                  <DialogHeader>
-                    <DialogTitle className='text-xl font-semibold'>
+                <DialogContent className='sm:max-w-125' showCloseButton={false}>
+                  <div className='flex items-start justify-between px-6 pt-6'>
+                    <DialogTitle className='text-xl font-semibold text-slate-900'>
                       Add Student
                     </DialogTitle>
-                  </DialogHeader>
+                    <button
+                      type='button'
+                      onClick={() => setIsModalOpen(false)}
+                      className='grid h-10 w-10 place-items-center rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
                   <form
                     onSubmit={handleSubmit}
                     className='flex flex-col items-center py-6'
@@ -521,10 +528,7 @@ export default function StudentsPage() {
                       >
                         Bekor qilish
                       </Button>
-                      <RoseButton
-                        type='submit'
-                        className='px-6 py-2'
-                      >
+                      <RoseButton type='submit' className='px-6 py-2'>
                         Saqlash
                       </RoseButton>
                     </div>

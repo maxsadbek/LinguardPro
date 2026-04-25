@@ -1,6 +1,9 @@
 import { useState } from 'react'
-import { X, Calendar, FileUp, Send } from 'lucide-react'
+import { X, FileUp, Send } from 'lucide-react'
+import { format } from 'date-fns'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import {
   Select,
   SelectContent,
@@ -27,7 +30,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 export function AssignTaskModal({ open, onOpenChange }: AssignTaskModalProps) {
   const [title, setTitle] = useState('')
   const [group, setGroup] = useState('IELTS Intensive')
-  const [deadline, setDeadline] = useState('')
+  const [deadline, setDeadline] = useState<Date | undefined>(undefined)
   const [description, setDescription] = useState('')
   const [files, setFiles] = useState<File[]>([])
 
@@ -47,7 +50,7 @@ export function AssignTaskModal({ open, onOpenChange }: AssignTaskModalProps) {
     onOpenChange(false)
     setTitle('')
     setGroup('IELTS Intensive')
-    setDeadline('')
+    setDeadline(undefined)
     setDescription('')
     setFiles([])
   }
@@ -58,7 +61,7 @@ export function AssignTaskModal({ open, onOpenChange }: AssignTaskModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-w-[720px] w-[95vw] max-h-[85vh] overflow-y-auto gap-0 rounded-[28px] border-0 bg-white p-0 shadow-[0_30px_90px_-50px_rgba(2,6,23,0.45)] [&>button.absolute]:hidden'>
+      <DialogContent className='max-h-[85vh] w-[95vw] max-w-[720px] gap-0 overflow-y-auto rounded-[28px] border-0 bg-white p-0 shadow-[0_30px_90px_-50px_rgba(2,6,23,0.45)] [&>button.absolute]:hidden'>
         <div className='flex items-start justify-between px-6 pt-5 md:px-8 md:pt-6'>
           <div>
             <h2 className='text-xl font-extrabold text-slate-900'>
@@ -90,7 +93,7 @@ export function AssignTaskModal({ open, onOpenChange }: AssignTaskModalProps) {
               />
             </div>
 
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <div className='flex flex-col gap-2'>
                 <FieldLabel>GURUHNI TANLANG</FieldLabel>
                 <Select value={group} onValueChange={setGroup}>
@@ -109,19 +112,26 @@ export function AssignTaskModal({ open, onOpenChange }: AssignTaskModalProps) {
 
               <div className='flex flex-col gap-2'>
                 <FieldLabel>MUDDAT</FieldLabel>
-                <div className='relative'>
-                  <input
-                    type='text'
-                    value={deadline}
-                    onChange={(e) => setDeadline(e.target.value)}
-                    placeholder='mm/dd/yyyy, --:-- --'
-                    className='h-11 w-full rounded-xl border-0 bg-slate-100 px-4 pr-10 text-sm font-medium text-slate-900 outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-rose-600/20'
-                  />
-                  <Calendar
-                    size={16}
-                    className='pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-slate-400'
-                  />
-                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type='button'
+                      className='h-11 w-full rounded-xl border-0 bg-slate-100 px-4 text-left text-sm font-medium text-slate-900 outline-none focus:ring-2 focus:ring-rose-600/20'
+                    >
+                      {deadline ? format(deadline, 'dd.MM.yyyy') : (
+                        <span className='text-slate-400'>Sanani tanlang</span>
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className='w-auto p-0' align='start'>
+                    <Calendar
+                      mode='single'
+                      selected={deadline}
+                      onSelect={setDeadline}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
@@ -157,7 +167,7 @@ export function AssignTaskModal({ open, onOpenChange }: AssignTaskModalProps) {
           </div>
         </div>
 
-        <div className='flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 px-6 pb-5 md:px-8 md:pb-6'>
+        <div className='flex flex-col-reverse items-stretch justify-end gap-3 px-6 pb-5 sm:flex-row sm:items-center md:px-8 md:pb-6'>
           <button
             type='button'
             onClick={handleClose}
