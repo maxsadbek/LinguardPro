@@ -279,7 +279,7 @@ export default function LinguaProAbout() {
           <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-px bg-gray-200" />
 
           <div className="flex flex-col gap-12">
-            {milestones.map((m, i) => (
+            {milestones.map((m) => (
               <div key={m.year} className={`relative flex items-start gap-8 ${m.side === "left" ? "flex-row-reverse" : "flex-row"}`}>
                 {/* Content */}
                 <div className={`w-[calc(50%-2rem)] ${m.side === "left" ? "text-right" : "text-left"}`}>

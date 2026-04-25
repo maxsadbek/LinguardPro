@@ -118,6 +118,7 @@ export function TeacherSidebar({ isOpen, setIsOpen }: TeacherSidebarProps) {
             onClick={() => setIsOpen(false)}
             className='rounded-lg p-2 hover:bg-slate-100'
           >
+            <X size={20} />
           </button>
         </div>
 

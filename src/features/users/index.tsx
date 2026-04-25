@@ -1,15 +1,20 @@
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import type { NavigateFn } from '@/hooks/use-table-url-state'
 import { UsersDialogs } from './components/users-dialogs'
 import { UsersProvider } from './components/users-provider'
 import { UsersTable } from './components/users-table'
 import { users } from './data/users'
 
 export function Users() {
+  const search = useSearch({ from: '/_authenticated/users/' })
+  const navigate = useNavigate() as NavigateFn
+
   return (
     <UsersProvider>
       <Header fixed>
@@ -28,7 +33,7 @@ export function Users() {
             </p>
           </div>
         </div>
-        <UsersTable data={users} />
+        <UsersTable data={users} search={search} navigate={navigate} />
       </Main>
 
       <UsersDialogs />

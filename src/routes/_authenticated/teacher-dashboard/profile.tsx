@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { User, Mail, Phone, MapPin, Calendar, Edit, Save } from 'lucide-react'
+import { Mail, Phone, MapPin, Calendar, Edit, Save } from 'lucide-react'
 
 export const Route = createFileRoute('/_authenticated/teacher-dashboard/profile')({
   component: ProfilePage,

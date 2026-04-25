@@ -9,9 +9,9 @@ async function importAuthStore() {
 const sampleUser = {
   accountNo: 'ACC-1',
   email: 'user@example.com',
-  role: ['user'],
+  role: 'user',
   exp: 1_700_000_000,
-}
+} as const
 
 describe('useAuthStore', () => {
   beforeEach(() => {
