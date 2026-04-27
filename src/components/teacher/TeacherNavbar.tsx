@@ -69,7 +69,8 @@ export function TeacherNavbar({ onMenuClick }: TeacherNavbarProps) {
 
     loadProfileData()
     window.addEventListener('profileDataUpdated', loadProfileData)
-    return () => window.removeEventListener('profileDataUpdated', loadProfileData)
+    return () =>
+      window.removeEventListener('profileDataUpdated', loadProfileData)
   }, [])
 
   const initials = useMemo(
@@ -108,75 +109,77 @@ export function TeacherNavbar({ onMenuClick }: TeacherNavbarProps) {
   const displayEmail = profileData?.email ?? sessionUser?.email ?? ''
 
   return (
-    <header className="sticky top-0 z-50 flex w-full items-center justify-between bg-white px-6 py-3 border-b border-slate-100">
+    <header className='sticky top-0 z-50 flex w-full items-center justify-between border-b border-slate-100 bg-white/80 px-6 py-3 backdrop-blur-md'>
       {/* Left: mobile menu + search */}
-      <div className="flex items-center gap-3">
+      <div className='flex items-center gap-3'>
         {onMenuClick ? (
           <button
             onClick={onMenuClick}
-            className="md:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100"
+            className='rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 md:hidden'
           >
             <Menu size={20} />
           </button>
         ) : (
-          <SidebarTrigger className="md:hidden" />
+          <SidebarTrigger className='md:hidden' />
         )}
 
         {/* Search */}
-        <div className="relative hidden md:block">
+        <div className='relative hidden md:block'>
           <Search
-            className="absolute top-1/2 left-3 -translate-y-1/2 text-slate-400"
+            className='absolute top-1/2 left-3 -translate-y-1/2 text-slate-400'
             size={16}
           />
           <input
-            type="text"
-            placeholder="Search student or task..."
-            className="w-60 rounded-full bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 placeholder:text-slate-400 outline-none focus:bg-slate-50 focus:ring-2 focus:ring-slate-200 transition"
+            type='text'
+            placeholder='Search student or task...'
+            className='w-60 rounded-full bg-slate-100 py-2 pr-4 pl-9 text-sm text-slate-700 transition outline-none placeholder:text-slate-400 focus:bg-slate-50 focus:ring-2 focus:ring-slate-200'
           />
         </div>
       </div>
 
       {/* Right: icons + divider + user */}
-      <div className="flex items-center gap-1">
+      <div className='flex items-center gap-1'>
         {/* Bell */}
         <Link
-          to="/teacher-dashboard/notifications"
-          className="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition"
-          aria-label="Notifications"
+          to='/teacher-dashboard/notifications'
+          className='relative rounded-lg p-2 text-slate-500 transition hover:bg-slate-100'
+          aria-label='Notifications'
         >
           <Bell size={20} />
           {/* red dot */}
-          <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-rose-500" />
+          <span className='absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-rose-500' />
         </Link>
 
         {/* Settings */}
         <Link
-          to="/teacher-dashboard/settings"
-          className="p-2 rounded-lg text-slate-500 hover:bg-slate-100 transition"
-          aria-label="Settings"
+          to='/teacher-dashboard/settings'
+          className='rounded-lg p-2 text-slate-500 transition hover:bg-slate-100'
+          aria-label='Settings'
         >
           <Settings size={20} />
         </Link>
 
         {/* Divider */}
-        <div className="mx-3 h-6 w-px bg-slate-200" />
+        <div className='mx-3 h-6 w-px bg-slate-200' />
 
         {/* User dropdown */}
-        <div ref={menuRef} className="relative">
+        <div ref={menuRef} className='relative'>
           <button
-            type="button"
+            type='button'
             onClick={() => setOpen((v) => !v)}
-            className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-slate-100 transition"
-            aria-haspopup="menu"
+            className='flex items-center gap-2.5 rounded-lg px-2 py-1.5 transition hover:bg-slate-100'
+            aria-haspopup='menu'
             aria-expanded={open}
           >
             {/* Name + email */}
-            <div className="hidden text-right md:block">
-              <p className="text-base font-semibold text-slate-800 leading-5">
+            <div className='hidden text-right md:block'>
+              <p className='text-base leading-5 font-semibold text-slate-800'>
                 {displayName}
               </p>
               {displayEmail && (
-                <p className="text-sm text-slate-400 leading-5">{displayEmail}</p>
+                <p className='text-sm leading-5 text-slate-400'>
+                  {displayEmail}
+                </p>
               )}
             </div>
 
@@ -184,11 +187,11 @@ export function TeacherNavbar({ onMenuClick }: TeacherNavbarProps) {
             {profilePhoto ? (
               <img
                 src={profilePhoto}
-                alt="Profile"
-                className="h-11 w-11 rounded-full object-cover ring-2 ring-slate-200"
+                alt='Profile'
+                className='h-11 w-11 rounded-full object-cover ring-2 ring-slate-200'
               />
             ) : (
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-base font-bold text-slate-600">
+              <div className='flex h-11 w-11 items-center justify-center rounded-full bg-slate-200 text-base font-bold text-slate-600'>
                 {initials}
               </div>
             )}
@@ -197,28 +200,28 @@ export function TeacherNavbar({ onMenuClick }: TeacherNavbarProps) {
           {/* Dropdown */}
           {open && (
             <div
-              role="menu"
-              className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg"
+              role='menu'
+              className='absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg'
             >
-              <div className="px-4 py-2.5 border-b border-slate-100">
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+              <div className='border-b border-slate-100 px-4 py-2.5'>
+                <p className='text-xs font-semibold tracking-wide text-slate-400 uppercase'>
                   Account
                 </p>
               </div>
               <Link
-                to="/teacher-dashboard/profile"
+                to='/teacher-dashboard/profile'
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition"
-                role="menuitem"
+                className='flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50'
+                role='menuitem'
               >
-                <User size={15} className="text-slate-400" />
+                <User size={15} className='text-slate-400' />
                 Profile
               </Link>
               <button
-                type="button"
+                type='button'
                 onClick={handleLogout}
-                className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-rose-600 hover:bg-rose-50 transition"
-                role="menuitem"
+                className='flex w-full items-center gap-2 px-4 py-2.5 text-sm text-rose-600 transition hover:bg-rose-50'
+                role='menuitem'
               >
                 <LogOut size={15} />
                 Exit
